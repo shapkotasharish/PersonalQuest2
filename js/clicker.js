@@ -29,70 +29,69 @@ const gameState = {
 // ==========================================
 
 const UPGRADES = {
-    // CLICKING UPGRADES - Gets progressively more expensive
-    // Early game: 15-50K | Mid game: 500K-50M | Late game: 500M-500T | End game: 5Qa-50Qi
+    // CLICKING UPGRADES - Balanced for progression to trillions
     clicking: [
-        { id: 'click1', name: 'Party Tap', icon: '👆', desc: 'Tap with more energy!', effect: '+1 per click', cost: 15, power: 1, maxLevel: 50, costScale: 1.12 },
-        { id: 'click2', name: 'Double Tap', icon: '✌️', desc: 'Two fingers, double fun!', effect: '+2 per click', cost: 100, power: 2, maxLevel: 50, costScale: 1.14, requires: { click1: 5 } },
-        { id: 'click3', name: 'Power Poke', icon: '💪', desc: 'Strong party vibes!', effect: '+5 per click', cost: 1000, power: 5, maxLevel: 40, costScale: 1.16, requires: { click2: 5 } },
-        { id: 'click4', name: 'Super Slap', icon: '🖐️', desc: 'Party slap!', effect: '+15 per click', cost: 15000, power: 15, maxLevel: 35, costScale: 1.18, requires: { click3: 5 } },
-        { id: 'click5', name: 'Mega Mash', icon: '👊', desc: 'Mash that party button!', effect: '+50 per click', cost: 500000, power: 50, maxLevel: 30, costScale: 1.20, requires: { click4: 5 } },
-        { id: 'click6', name: 'Ultra Touch', icon: '✨', desc: 'Magical fingertips!', effect: '+150 per click', cost: 25000000, power: 150, maxLevel: 25, costScale: 1.22, requires: { click5: 5 } },
-        { id: 'click7', name: 'Cosmic Click', icon: '🌟', desc: 'Click from the stars!', effect: '+500 per click', cost: 2000000000, power: 500, maxLevel: 20, costScale: 1.25, requires: { click6: 5 } },
-        { id: 'click8', name: 'Galaxy Grip', icon: '🌌', desc: 'The power of galaxies!', effect: '+2000 per click', cost: 500000000000, power: 2000, maxLevel: 15, costScale: 1.28, requires: { click7: 5 } },
-        { id: 'click9', name: 'Universe Unleash', icon: '💫', desc: 'Universal party power!', effect: '+10000 per click', cost: 5e15, power: 10000, maxLevel: 10, costScale: 1.30, requires: { click8: 5 } },
-        { id: 'click10', name: 'Infinity Tap', icon: '♾️', desc: 'Infinite party energy!', effect: '+50000 per click', cost: 5e18, power: 50000, maxLevel: 10, costScale: 1.35, requires: { click9: 5 } },
+        { id: 'click1', name: 'Party Tap', icon: '👆', desc: 'Tap with more energy!', effect: '+1 per click', cost: 15, power: 1, maxLevel: 50, costScale: 1.10 },
+        { id: 'click2', name: 'Double Tap', icon: '✌️', desc: 'Two fingers, double fun!', effect: '+3 per click', cost: 150, power: 3, maxLevel: 50, costScale: 1.12, requires: { click1: 5 } },
+        { id: 'click3', name: 'Power Poke', icon: '💪', desc: 'Strong party vibes!', effect: '+10 per click', cost: 2000, power: 10, maxLevel: 40, costScale: 1.14, requires: { click2: 5 } },
+        { id: 'click4', name: 'Super Slap', icon: '🖐️', desc: 'Party slap!', effect: '+50 per click', cost: 25000, power: 50, maxLevel: 35, costScale: 1.15, requires: { click3: 5 } },
+        { id: 'click5', name: 'Mega Mash', icon: '👊', desc: 'Mash that party button!', effect: '+250 per click', cost: 500000, power: 250, maxLevel: 30, costScale: 1.16, requires: { click4: 5 } },
+        { id: 'click6', name: 'Ultra Touch', icon: '✨', desc: 'Magical fingertips!', effect: '+1.5K per click', cost: 15000000, power: 1500, maxLevel: 25, costScale: 1.18, requires: { click5: 5 } },
+        { id: 'click7', name: 'Cosmic Click', icon: '🌟', desc: 'Click from the stars!', effect: '+10K per click', cost: 500000000, power: 10000, maxLevel: 20, costScale: 1.20, requires: { click6: 5 } },
+        { id: 'click8', name: 'Galaxy Grip', icon: '🌌', desc: 'The power of galaxies!', effect: '+75K per click', cost: 25000000000, power: 75000, maxLevel: 15, costScale: 1.22, requires: { click7: 5 } },
+        { id: 'click9', name: 'Universe Unleash', icon: '💫', desc: 'Universal party power!', effect: '+500K per click', cost: 2e12, power: 500000, maxLevel: 12, costScale: 1.25, requires: { click8: 5 } },
+        { id: 'click10', name: 'Infinity Tap', icon: '♾️', desc: 'Infinite party energy!', effect: '+5M per click', cost: 500e12, power: 5000000, maxLevel: 10, costScale: 1.28, requires: { click9: 5 } },
     ],
 
     // HELPER UPGRADES - Party animals that generate passive income
-    // Each helper is significantly more expensive than the last
+    // Balanced so late-game helpers provide massive income
     helpers: [
-        { id: 'puppy1', name: 'Party Puppy', icon: '🐶', desc: 'A cute puppy joins the party!', effect: '+1/sec', cost: 100, income: 1, maxLevel: 20, helperType: 'puppy', costScale: 1.12 },
-        { id: 'puppy2', name: 'Dancing Dog', icon: '🐕', desc: 'This pup has moves!', effect: '+5/sec', cost: 1500, income: 5, maxLevel: 20, helperType: 'puppy', costScale: 1.14, requires: { puppy1: 3 } },
-        { id: 'panda1', name: 'Red Panda', icon: '🐼', desc: 'Adorable helper!', effect: '+15/sec', cost: 25000, income: 15, maxLevel: 15, helperType: 'panda', costScale: 1.15 },
-        { id: 'panda2', name: 'Party Panda', icon: '🐻', desc: 'Panda with balloons!', effect: '+50/sec', cost: 500000, income: 50, maxLevel: 15, helperType: 'panda', costScale: 1.16, requires: { panda1: 3 } },
-        { id: 'bunny1', name: 'Birthday Bunny', icon: '🐰', desc: 'Hop hop party!', effect: '+150/sec', cost: 15000000, income: 150, maxLevel: 12, helperType: 'bunny', costScale: 1.18, requires: { puppy2: 5 } },
-        { id: 'cat1', name: 'Confetti Cat', icon: '🐱', desc: 'Meow-velous helper!', effect: '+500/sec', cost: 750000000, income: 500, maxLevel: 12, helperType: 'cat', costScale: 1.20, requires: { bunny1: 3 } },
-        { id: 'unicorn1', name: 'Party Unicorn', icon: '🦄', desc: 'Magical party creature!', effect: '+2000/sec', cost: 100000000000, income: 2000, maxLevel: 10, helperType: 'special', costScale: 1.22, requires: { cat1: 3 } },
-        { id: 'dragon1', name: 'Friendly Dragon', icon: '🐲', desc: 'Breathes confetti!', effect: '+10000/sec', cost: 25e12, income: 10000, maxLevel: 8, helperType: 'special', costScale: 1.25, requires: { unicorn1: 3 } },
-        { id: 'phoenix1', name: 'Party Phoenix', icon: '🔥', desc: 'Eternal party spirit!', effect: '+50000/sec', cost: 10e15, income: 50000, maxLevel: 6, helperType: 'special', costScale: 1.28, requires: { dragon1: 3 } },
-        { id: 'dubai1', name: 'Dubai Chocolate Panda', icon: '🍫', desc: 'Super rare! Unwraps chocolate!', effect: '+15% global', cost: 10e18, income: 0, boost: 0.15, maxLevel: 5, helperType: 'special', costScale: 1.50, requires: { phoenix1: 2 } },
+        { id: 'puppy1', name: 'Party Puppy', icon: '🐶', desc: 'A cute puppy joins the party!', effect: '+1/sec', cost: 50, income: 1, maxLevel: 25, helperType: 'puppy', costScale: 1.10 },
+        { id: 'puppy2', name: 'Dancing Dog', icon: '🐕', desc: 'This pup has moves!', effect: '+8/sec', cost: 800, income: 8, maxLevel: 25, helperType: 'puppy', costScale: 1.12, requires: { puppy1: 3 } },
+        { id: 'panda1', name: 'Red Panda', icon: '🐼', desc: 'Adorable helper!', effect: '+40/sec', cost: 10000, income: 40, maxLevel: 20, helperType: 'panda', costScale: 1.13 },
+        { id: 'panda2', name: 'Party Panda', icon: '🐻', desc: 'Panda with balloons!', effect: '+200/sec', cost: 150000, income: 200, maxLevel: 20, helperType: 'panda', costScale: 1.14, requires: { panda1: 3 } },
+        { id: 'bunny1', name: 'Birthday Bunny', icon: '🐰', desc: 'Hop hop party!', effect: '+1K/sec', cost: 3000000, income: 1000, maxLevel: 18, helperType: 'bunny', costScale: 1.15, requires: { puppy2: 5 } },
+        { id: 'cat1', name: 'Confetti Cat', icon: '🐱', desc: 'Meow-velous helper!', effect: '+8K/sec', cost: 75000000, income: 8000, maxLevel: 15, helperType: 'cat', costScale: 1.16, requires: { bunny1: 3 } },
+        { id: 'unicorn1', name: 'Party Unicorn', icon: '🦄', desc: 'Magical party creature!', effect: '+50K/sec', cost: 3000000000, income: 50000, maxLevel: 12, helperType: 'special', costScale: 1.18, requires: { cat1: 3 } },
+        { id: 'dragon1', name: 'Friendly Dragon', icon: '🐲', desc: 'Breathes confetti!', effect: '+400K/sec', cost: 150000000000, income: 400000, maxLevel: 10, helperType: 'special', costScale: 1.20, requires: { unicorn1: 3 } },
+        { id: 'phoenix1', name: 'Party Phoenix', icon: '🔥', desc: 'Eternal party spirit!', effect: '+5M/sec', cost: 10e12, income: 5000000, maxLevel: 8, helperType: 'special', costScale: 1.22, requires: { dragon1: 3 } },
+        { id: 'dubai1', name: 'Dubai Chocolate Panda', icon: '🍫', desc: 'Super rare! Unwraps chocolate!', effect: '+50M/sec & +25% global', cost: 2e15, income: 50000000, boost: 0.25, maxLevel: 5, helperType: 'special', costScale: 1.30, requires: { phoenix1: 2 } },
     ],
 
     // DECORATION UPGRADES - Visual upgrades that boost stats
     decorations: [
-        { id: 'balloon1', name: 'Balloons', icon: '🎈', desc: 'Colorful balloons!', effect: '+5% click power', cost: 200, clickBoost: 0.05, maxLevel: 10, costScale: 1.20 },
-        { id: 'streamer1', name: 'Streamers', icon: '🎊', desc: 'Party streamers!', effect: '+5% passive', cost: 350, passiveBoost: 0.05, maxLevel: 10, costScale: 1.20 },
-        { id: 'confetti1', name: 'Confetti Cannon', icon: '🎉', desc: 'Boom! Confetti!', effect: '+10% click power', cost: 10000, clickBoost: 0.1, maxLevel: 8, costScale: 1.25, requires: { balloon1: 3 } },
-        { id: 'banner1', name: 'Party Banner', icon: '🏳️', desc: 'Happy Birthday banner!', effect: '+10% passive', cost: 15000, passiveBoost: 0.1, maxLevel: 8, costScale: 1.25, requires: { streamer1: 3 } },
-        { id: 'disco1', name: 'Disco Ball', icon: '🪩', desc: 'Let\'s disco!', effect: '+15% all income', cost: 1000000, globalBoost: 0.15, maxLevel: 6, costScale: 1.30, requires: { confetti1: 3 } },
-        { id: 'lights1', name: 'Party Lights', icon: '💡', desc: 'Sparkly lights!', effect: '+15% click power', cost: 2500000, clickBoost: 0.15, maxLevel: 6, costScale: 1.30, requires: { banner1: 3 } },
-        { id: 'cake_deco1', name: 'Giant Cake Display', icon: '🎂', desc: 'Impressive centerpiece!', effect: '+20% passive', cost: 500000000, passiveBoost: 0.2, maxLevel: 5, costScale: 1.35, requires: { disco1: 2 } },
-        { id: 'fountain1', name: 'Chocolate Fountain', icon: '⛲', desc: 'Delicious decoration!', effect: '+20% all income', cost: 5000000000, globalBoost: 0.2, maxLevel: 5, costScale: 1.35, requires: { lights1: 2 } },
-        { id: 'fireworks1', name: 'Fireworks', icon: '🎆', desc: 'Spectacular display!', effect: '+25% all income', cost: 1e12, globalBoost: 0.25, maxLevel: 4, costScale: 1.40, requires: { cake_deco1: 2 } },
-        { id: 'rainbow1', name: 'Rainbow Arch', icon: '🌈', desc: 'Magical rainbow!', effect: '+30% all income', cost: 500e12, globalBoost: 0.3, maxLevel: 3, costScale: 1.50, requires: { fireworks1: 2 } },
+        { id: 'balloon1', name: 'Balloons', icon: '🎈', desc: 'Colorful balloons!', effect: '+10% click power', cost: 200, clickBoost: 0.10, maxLevel: 10, costScale: 1.18 },
+        { id: 'streamer1', name: 'Streamers', icon: '🎊', desc: 'Party streamers!', effect: '+10% passive', cost: 350, passiveBoost: 0.10, maxLevel: 10, costScale: 1.18 },
+        { id: 'confetti1', name: 'Confetti Cannon', icon: '🎉', desc: 'Boom! Confetti!', effect: '+15% click power', cost: 8000, clickBoost: 0.15, maxLevel: 8, costScale: 1.22, requires: { balloon1: 3 } },
+        { id: 'banner1', name: 'Party Banner', icon: '🏳️', desc: 'Happy Birthday banner!', effect: '+15% passive', cost: 12000, passiveBoost: 0.15, maxLevel: 8, costScale: 1.22, requires: { streamer1: 3 } },
+        { id: 'disco1', name: 'Disco Ball', icon: '🪩', desc: 'Let\'s disco!', effect: '+25% all income', cost: 500000, globalBoost: 0.25, maxLevel: 6, costScale: 1.28, requires: { confetti1: 3 } },
+        { id: 'lights1', name: 'Party Lights', icon: '💡', desc: 'Sparkly lights!', effect: '+25% click power', cost: 1000000, clickBoost: 0.25, maxLevel: 6, costScale: 1.28, requires: { banner1: 3 } },
+        { id: 'cake_deco1', name: 'Giant Cake Display', icon: '🎂', desc: 'Impressive centerpiece!', effect: '+35% passive', cost: 100000000, passiveBoost: 0.35, maxLevel: 5, costScale: 1.32, requires: { disco1: 2 } },
+        { id: 'fountain1', name: 'Chocolate Fountain', icon: '⛲', desc: 'Delicious decoration!', effect: '+40% all income', cost: 1000000000, globalBoost: 0.40, maxLevel: 5, costScale: 1.32, requires: { lights1: 2 } },
+        { id: 'fireworks1', name: 'Fireworks', icon: '🎆', desc: 'Spectacular display!', effect: '+50% all income', cost: 100e9, globalBoost: 0.50, maxLevel: 4, costScale: 1.35, requires: { cake_deco1: 2 } },
+        { id: 'rainbow1', name: 'Rainbow Arch', icon: '🌈', desc: 'Magical rainbow!', effect: '+75% all income', cost: 25e12, globalBoost: 0.75, maxLevel: 3, costScale: 1.40, requires: { fireworks1: 2 } },
     ],
 
     // BOOST UPGRADES - Powerful multipliers and special effects
     boosts: [
-        { id: 'sugar1', name: 'Sugar Rush', icon: '🍬', desc: 'Sweet energy boost!', effect: '2x clicks for 30s', cost: 2000, temporary: true, duration: 30, multiplier: 2, maxLevel: 1 },
-        { id: 'party1', name: 'Party Mode', icon: '🥳', desc: 'Maximum party vibes!', effect: '2x all income for 60s', cost: 15000, temporary: true, duration: 60, multiplier: 2, maxLevel: 1, requires: { sugar1: 1 } },
-        { id: 'lucky1', name: 'Lucky Charm', icon: '🍀', desc: '10% chance for 5x clicks', effect: 'Lucky clicks!', cost: 100000, luck: 0.1, luckMulti: 5, maxLevel: 10, costScale: 1.35 },
-        { id: 'magnet1', name: 'Party Magnet', icon: '🧲', desc: 'Attract more party power!', effect: '+25% passive income', cost: 2500000, passiveBoost: 0.25, maxLevel: 8, costScale: 1.40, requires: { party1: 1 } },
-        { id: 'clock1', name: 'Party Time', icon: '⏰', desc: 'Time flies when having fun!', effect: '+50% helper speed', cost: 100000000, helperBoost: 0.5, maxLevel: 6, costScale: 1.45, requires: { magnet1: 3 } },
-        { id: 'star1', name: 'Star Power', icon: '⭐', desc: 'Starlight energy!', effect: '+2% per Party Star', cost: 10000000000, starBoost: 0.02, maxLevel: 10, costScale: 1.50, requires: { clock1: 2 } },
-        { id: 'mega1', name: 'Mega Multiplier', icon: '🔥', desc: 'Everything is better!', effect: '+75% global', cost: 2e12, globalBoost: 0.75, maxLevel: 5, costScale: 1.60, requires: { star1: 3 } },
-        { id: 'golden1', name: 'Golden Touch', icon: '👑', desc: 'Everything you touch turns to gold!', effect: '5x click power', cost: 500e12, clickMulti: 5, maxLevel: 3, costScale: 1.80, requires: { mega1: 2 } },
-        { id: 'infinite1', name: 'Infinite Energy', icon: '♾️', desc: 'Unlimited power source!', effect: '+150% all income', cost: 100e15, globalBoost: 1.5, maxLevel: 3, costScale: 2.0, requires: { golden1: 2 } },
-        { id: 'cosmic1', name: 'Cosmic Blessing', icon: '🌠', desc: 'Blessed by the party gods!', effect: '+300% all income', cost: 50e18, globalBoost: 3.0, maxLevel: 2, costScale: 2.5, requires: { infinite1: 2 } },
+        { id: 'sugar1', name: 'Sugar Rush', icon: '🍬', desc: 'Sweet energy boost!', effect: '2x clicks for 30s', cost: 1500, temporary: true, duration: 30, multiplier: 2, maxLevel: 1 },
+        { id: 'party1', name: 'Party Mode', icon: '🥳', desc: 'Maximum party vibes!', effect: '2x all income for 60s', cost: 10000, temporary: true, duration: 60, multiplier: 2, maxLevel: 1, requires: { sugar1: 1 } },
+        { id: 'lucky1', name: 'Lucky Charm', icon: '🍀', desc: '10% chance for 5x clicks', effect: 'Lucky clicks!', cost: 50000, luck: 0.10, luckMulti: 5, maxLevel: 10, costScale: 1.30 },
+        { id: 'magnet1', name: 'Party Magnet', icon: '🧲', desc: 'Attract more party power!', effect: '+50% passive income', cost: 1000000, passiveBoost: 0.50, maxLevel: 8, costScale: 1.35, requires: { party1: 1 } },
+        { id: 'clock1', name: 'Party Time', icon: '⏰', desc: 'Time flies when having fun!', effect: '+75% helper speed', cost: 25000000, helperBoost: 0.75, maxLevel: 6, costScale: 1.38, requires: { magnet1: 3 } },
+        { id: 'star1', name: 'Star Power', icon: '⭐', desc: 'Starlight energy!', effect: '+5% per Party Star', cost: 2000000000, starBoost: 0.05, maxLevel: 10, costScale: 1.40, requires: { clock1: 2 } },
+        { id: 'mega1', name: 'Mega Multiplier', icon: '🔥', desc: 'Everything is better!', effect: '+100% global', cost: 100e9, globalBoost: 1.0, maxLevel: 5, costScale: 1.50, requires: { star1: 3 } },
+        { id: 'golden1', name: 'Golden Touch', icon: '👑', desc: 'Everything you touch turns to gold!', effect: '10x click power', cost: 10e12, clickMulti: 10, maxLevel: 3, costScale: 1.60, requires: { mega1: 2 } },
+        { id: 'infinite1', name: 'Infinite Energy', icon: '♾️', desc: 'Unlimited power source!', effect: '+200% all income', cost: 1e15, globalBoost: 2.0, maxLevel: 3, costScale: 1.80, requires: { golden1: 2 } },
+        { id: 'cosmic1', name: 'Cosmic Blessing', icon: '🌠', desc: 'Blessed by the party gods!', effect: '+500% all income', cost: 500e15, globalBoost: 5.0, maxLevel: 2, costScale: 2.0, requires: { infinite1: 2 } },
     ],
 
-    // THEME UPGRADES - Visual styles (costs increased for late-game unlocks)
+    // THEME UPGRADES - Visual styles
     themes: [
-        { id: 'theme_night', name: 'Night Party', icon: '🌙', desc: 'Party under the stars!', effect: 'New visual style', cost: 50000, themeClass: 'theme-night', maxLevel: 1 },
-        { id: 'theme_neon', name: 'Neon Dance Floor', icon: '💜', desc: 'Glow in the dark!', effect: 'Neon visual style', cost: 5000000, themeClass: 'theme-neon', maxLevel: 1, requires: { theme_night: 1 } },
-        { id: 'theme_puppy', name: 'Puppy Pajama Party', icon: '💤', desc: 'Cozy puppy theme!', effect: 'Cozy visual style', cost: 1000000000, themeClass: 'theme-puppy', maxLevel: 1, requires: { theme_neon: 1 } },
-        { id: 'theme_panda', name: 'Red Panda Festival', icon: '🎋', desc: 'Bamboo paradise!', effect: 'Nature visual style', cost: 500000000000, themeClass: 'theme-panda', maxLevel: 1, requires: { theme_puppy: 1 } },
+        { id: 'theme_night', name: 'Night Party', icon: '🌙', desc: 'Party under the stars!', effect: 'New visual style', cost: 25000, themeClass: 'theme-night', maxLevel: 1 },
+        { id: 'theme_neon', name: 'Neon Dance Floor', icon: '💜', desc: 'Glow in the dark!', effect: 'Neon visual style', cost: 2000000, themeClass: 'theme-neon', maxLevel: 1, requires: { theme_night: 1 } },
+        { id: 'theme_puppy', name: 'Puppy Pajama Party', icon: '💤', desc: 'Cozy puppy theme!', effect: 'Cozy visual style', cost: 250000000, themeClass: 'theme-puppy', maxLevel: 1, requires: { theme_neon: 1 } },
+        { id: 'theme_panda', name: 'Red Panda Festival', icon: '🎋', desc: 'Bamboo paradise!', effect: 'Nature visual style', cost: 50000000000, themeClass: 'theme-panda', maxLevel: 1, requires: { theme_puppy: 1 } },
     ]
 };
 
@@ -120,6 +119,7 @@ function initGame() {
     initUpgrades();
     initRebirth();
     initBackButton();
+    initPanelToggle();
     updateDisplay();
 
     // Start background music
@@ -135,6 +135,29 @@ function initGame() {
     if (window.easterEggs) {
         window.easterEggs.createEgg('clicker-1', '2%', '95%');
     }
+}
+
+// ==========================================
+// PANEL TOGGLE
+// ==========================================
+
+function initPanelToggle() {
+    const panel = document.getElementById('upgradesPanel');
+    const toggle = document.getElementById('panelToggle');
+
+    if (!panel || !toggle) return;
+
+    // Load saved state
+    const isCollapsed = localStorage.getItem('shopCollapsed') === 'true';
+    if (isCollapsed) {
+        panel.classList.add('collapsed');
+    }
+
+    toggle.addEventListener('click', () => {
+        panel.classList.toggle('collapsed');
+        localStorage.setItem('shopCollapsed', panel.classList.contains('collapsed'));
+        if (window.partyAudio) window.partyAudio.playClick();
+    });
 }
 
 // ==========================================
@@ -1232,7 +1255,7 @@ function initRebirth() {
     if (!rebirthBtn) return;
 
     rebirthBtn.addEventListener('click', () => {
-        if (gameState.partyPower >= 10000000000) { // 10 billion
+        if (gameState.partyPower >= 100000000000) { // 100 billion
             showRebirthConfirmation();
         }
     });
@@ -1256,8 +1279,8 @@ function showRebirthConfirmation() {
 }
 
 function calculateRebirthStars() {
-    // Rebirth at 10 billion, gain stars based on sqrt of power/10B
-    return Math.floor(Math.sqrt(gameState.partyPower / 10000000000));
+    // Rebirth at 100 billion, gain stars based on sqrt of power/100B
+    return Math.floor(Math.sqrt(gameState.partyPower / 100000000000));
 }
 
 function performRebirth() {
@@ -1353,7 +1376,7 @@ function updateDisplay() {
     const rebirthBtn = document.getElementById('rebirthBtn');
     const rebirthInfo = document.getElementById('rebirthInfo');
 
-    const REBIRTH_THRESHOLD = 10000000000; // 10 billion
+    const REBIRTH_THRESHOLD = 100000000000; // 100 billion
     if (gameState.partyPower >= REBIRTH_THRESHOLD) {
         rebirthBtn.disabled = false;
         const stars = calculateRebirthStars();
