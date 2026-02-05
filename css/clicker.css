@@ -205,60 +205,113 @@ body.theme-neon .dance-floor {
     pointer-events: none;
 }
 
-/* Helpers Area */
+/* Helpers Area - Now full scene for roaming */
 .helpers-area {
     position: absolute;
-    bottom: 5%;
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 25%;
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-end;
-    padding: 0 var(--spacing-md);
+    height: 40%;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* Individual Helper - Now absolutely positioned and moves! */
+.helper {
+    position: absolute;
+    font-size: 2.5rem;
+    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
+    cursor: pointer;
+    pointer-events: auto;
+    transition: transform 0.1s ease;
     z-index: 5;
 }
 
-.helper {
-    font-size: 3rem;
-    animation: helper-idle 1s ease-in-out infinite;
-    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
-    transition: transform 0.3s ease;
+.helper:hover {
+    transform: scale(1.2) !important;
 }
 
-.helper:nth-child(odd) {
-    animation-delay: 0.5s;
-}
-
+/* Puppy animations */
 .helper.puppy {
-    animation-name: puppy-hop;
+    animation: puppy-bounce 0.6s ease-in-out infinite;
 }
 
-@keyframes puppy-hop {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
+.helper.puppy.walking {
+    animation: puppy-walk 0.3s steps(2) infinite;
 }
 
+@keyframes puppy-bounce {
+    0%, 100% { transform: translateY(0) scaleX(var(--dir, 1)); }
+    50% { transform: translateY(-8px) scaleX(var(--dir, 1)); }
+}
+
+@keyframes puppy-walk {
+    0%, 100% { transform: translateY(0) scaleX(var(--dir, 1)) rotate(-5deg); }
+    50% { transform: translateY(-3px) scaleX(var(--dir, 1)) rotate(5deg); }
+}
+
+/* Panda animations */
 .helper.panda {
-    animation-name: panda-waddle;
+    animation: panda-sway 1s ease-in-out infinite;
 }
 
-@keyframes panda-waddle {
-    0%, 100% { transform: rotate(-5deg); }
-    50% { transform: rotate(5deg); }
+.helper.panda.walking {
+    animation: panda-waddle-walk 0.4s ease-in-out infinite;
 }
 
+@keyframes panda-sway {
+    0%, 100% { transform: rotate(-8deg) scaleX(var(--dir, 1)); }
+    50% { transform: rotate(8deg) scaleX(var(--dir, 1)); }
+}
+
+@keyframes panda-waddle-walk {
+    0%, 100% { transform: translateY(0) rotate(-10deg) scaleX(var(--dir, 1)); }
+    25% { transform: translateY(-5px) rotate(0deg) scaleX(var(--dir, 1)); }
+    50% { transform: translateY(0) rotate(10deg) scaleX(var(--dir, 1)); }
+    75% { transform: translateY(-5px) rotate(0deg) scaleX(var(--dir, 1)); }
+}
+
+/* Bunny animations */
+.helper.bunny {
+    animation: bunny-hop 0.8s ease-in-out infinite;
+}
+
+@keyframes bunny-hop {
+    0%, 100% { transform: translateY(0) scaleX(var(--dir, 1)); }
+    30% { transform: translateY(-20px) scaleX(var(--dir, 1)); }
+    50% { transform: translateY(-25px) scaleX(var(--dir, 1)); }
+    80% { transform: translateY(-5px) scaleX(var(--dir, 1)); }
+}
+
+/* Cat animations */
+.helper.cat {
+    animation: cat-stretch 2s ease-in-out infinite;
+}
+
+@keyframes cat-stretch {
+    0%, 100% { transform: scaleX(var(--dir, 1)) scaleY(1); }
+    50% { transform: scaleX(var(--dir, 1)) scaleY(0.9) translateY(3px); }
+}
+
+/* Special/magical helpers */
 .helper.special {
-    animation-name: special-sparkle;
+    animation: special-float 2s ease-in-out infinite;
 }
 
-@keyframes special-sparkle {
-    0%, 100% { transform: scale(1); filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3)); }
-    50% { transform: scale(1.1); filter: drop-shadow(2px 4px 15px rgba(255, 234, 167, 0.8)); }
+@keyframes special-float {
+    0%, 100% {
+        transform: translateY(0) scaleX(var(--dir, 1));
+        filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
+    }
+    50% {
+        transform: translateY(-15px) scaleX(var(--dir, 1));
+        filter: drop-shadow(2px 4px 20px rgba(255, 234, 167, 0.8));
+    }
 }
 
+/* Helper entering scene */
 .helper.entering {
-    animation: helper-enter 0.5s ease-out;
+    animation: helper-enter 0.5s ease-out forwards;
 }
 
 @keyframes helper-enter {
@@ -267,12 +320,123 @@ body.theme-neon .dance-floor {
         opacity: 0;
     }
     60% {
-        transform: translateY(-10px) scale(1.1);
+        transform: translateY(-10px) scale(1.2);
     }
     100% {
         transform: translateY(0) scale(1);
         opacity: 1;
     }
+}
+
+/* Helper interaction animations */
+.helper.excited {
+    animation: helper-excited 0.3s ease-in-out 3;
+}
+
+@keyframes helper-excited {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(-10deg); }
+    75% { transform: scale(1.1) rotate(10deg); }
+}
+
+.helper.hearts {
+    position: relative;
+}
+
+.helper.hearts::after {
+    content: '💕';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1rem;
+    animation: float-hearts 1s ease-out forwards;
+}
+
+@keyframes float-hearts {
+    0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+}
+
+/* Speech bubble for helpers */
+.helper-speech {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: #333;
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-family: var(--font-heading);
+    white-space: nowrap;
+    animation: speech-pop 2s ease-out forwards;
+    z-index: 100;
+}
+
+.helper-speech::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: white;
+}
+
+@keyframes speech-pop {
+    0% { opacity: 0; transform: translateX(-50%) scale(0); }
+    10% { opacity: 1; transform: translateX(-50%) scale(1); }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+
+/* Party elements */
+.party-element {
+    position: absolute;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.floating-balloon {
+    font-size: 2rem;
+    animation: balloon-float-around 8s ease-in-out infinite;
+}
+
+@keyframes balloon-float-around {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    25% { transform: translateY(-20px) rotate(5deg); }
+    50% { transform: translateY(-10px) rotate(-3deg); }
+    75% { transform: translateY(-25px) rotate(3deg); }
+}
+
+.disco-light {
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: disco-move 3s ease-in-out infinite;
+    mix-blend-mode: screen;
+}
+
+@keyframes disco-move {
+    0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+    25% { transform: translate(50px, -30px); opacity: 0.8; }
+    50% { transform: translate(-30px, -50px); opacity: 0.6; }
+    75% { transform: translate(20px, -20px); opacity: 0.9; }
+}
+
+.confetti-piece {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    animation: confetti-drift 4s linear infinite;
+}
+
+@keyframes confetti-drift {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100px) rotate(360deg); opacity: 0; }
 }
 
 /* Upgrades Panel */

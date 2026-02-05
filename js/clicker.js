@@ -487,24 +487,213 @@ function purchaseUpgrade(upgrade, category) {
 }
 
 // ==========================================
-// HELPERS
+// INTERACTIVE HELPERS SYSTEM
 // ==========================================
 
-function addHelper(upgrade) {
-    const helpersArea = document.getElementById('helpersArea');
-    if (!helpersArea) return;
+const helperSystem = {
+    helpers: [],
+    maxHelpers: 12,
+    updateInterval: null,
+    interactionInterval: null
+};
 
-    // Limit visible helpers
-    const existingHelpers = helpersArea.querySelectorAll('.helper');
-    if (existingHelpers.length >= 8) return;
+const HELPER_PHRASES = {
+    puppy: ['Woof!', 'Party time!', '*wags tail*', 'Yay!', '*happy dance*', 'Bork!'],
+    panda: ['Nom nom!', '*munch*', 'Bamboo!', 'So fluffy!', '*rolls around*', 'Yawn~'],
+    bunny: ['Hop hop!', '*wiggles nose*', 'Wheee!', 'Bouncy!', '*thump thump*'],
+    cat: ['Meow!', '*purrrr*', 'Party cat!', '*stretches*', 'Confetti!'],
+    special: ['Sparkle!', 'Magic!', '✨✨✨', 'Woooow!', '*glitters*', 'Amazing!']
+};
+
+function createInteractiveHelper(upgrade, index) {
+    const helpersArea = document.getElementById('helpersArea');
+    if (!helpersArea) return null;
 
     const helper = document.createElement('div');
-    helper.className = `helper ${upgrade.helperType} entering`;
+    helper.className = `helper ${upgrade.helperType}`;
     helper.textContent = upgrade.icon;
+    helper.dataset.type = upgrade.helperType;
+    helper.dataset.id = `helper-${Date.now()}-${index}`;
 
+    // Random starting position
+    const startX = 10 + Math.random() * 80;
+    const startY = 60 + Math.random() * 30;
+    helper.style.left = startX + '%';
+    helper.style.bottom = (100 - startY) + '%';
+
+    // Direction (1 = right, -1 = left)
+    const dir = Math.random() > 0.5 ? 1 : -1;
+    helper.style.setProperty('--dir', dir);
+
+    // Helper state
+    const helperData = {
+        element: helper,
+        x: startX,
+        y: startY,
+        targetX: startX,
+        direction: dir,
+        state: 'idle', // idle, walking, interacting
+        type: upgrade.helperType,
+        speed: 0.3 + Math.random() * 0.2,
+        nextActionTime: Date.now() + 1000 + Math.random() * 3000
+    };
+
+    // Click interaction
+    helper.addEventListener('click', () => {
+        helperClicked(helperData);
+    });
+
+    helper.classList.add('entering');
     helpersArea.appendChild(helper);
 
     setTimeout(() => helper.classList.remove('entering'), 500);
+
+    return helperData;
+}
+
+function helperClicked(helperData) {
+    const helper = helperData.element;
+
+    // Play sound
+    if (window.partyAudio) window.partyAudio.playGiggle();
+
+    // Show speech bubble
+    showHelperSpeech(helper, helperData.type);
+
+    // Excited animation
+    helper.classList.add('excited');
+    setTimeout(() => helper.classList.remove('excited'), 900);
+
+    // Small bonus
+    const bonus = Math.max(1, Math.floor(calculateClickPower() * 0.1));
+    gameState.partyPower += bonus;
+    gameState.totalEarned += bonus;
+
+    const rect = helper.getBoundingClientRect();
+    showFloatingNumber(rect.left + rect.width/2, rect.top, `+${formatNumber(bonus)}`, '#81ecec');
+
+    updateDisplay();
+}
+
+function showHelperSpeech(helper, type) {
+    // Remove existing speech
+    const existing = helper.querySelector('.helper-speech');
+    if (existing) existing.remove();
+
+    const phrases = HELPER_PHRASES[type] || HELPER_PHRASES.special;
+    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+
+    const speech = document.createElement('div');
+    speech.className = 'helper-speech';
+    speech.textContent = phrase;
+    helper.appendChild(speech);
+
+    setTimeout(() => speech.remove(), 2000);
+}
+
+function updateHelpers() {
+    const now = Date.now();
+
+    helperSystem.helpers.forEach(helperData => {
+        if (!helperData.element.parentElement) return;
+
+        // Time for new action?
+        if (now >= helperData.nextActionTime) {
+            decideHelperAction(helperData);
+            helperData.nextActionTime = now + 2000 + Math.random() * 4000;
+        }
+
+        // Move if walking
+        if (helperData.state === 'walking') {
+            moveHelper(helperData);
+        }
+    });
+}
+
+function decideHelperAction(helperData) {
+    const action = Math.random();
+
+    if (action < 0.4) {
+        // Walk to new position
+        helperData.state = 'walking';
+        helperData.targetX = 10 + Math.random() * 80;
+        helperData.direction = helperData.targetX > helperData.x ? 1 : -1;
+        helperData.element.style.setProperty('--dir', helperData.direction);
+        helperData.element.classList.add('walking');
+    } else if (action < 0.6) {
+        // Random speech
+        helperData.state = 'idle';
+        helperData.element.classList.remove('walking');
+        if (Math.random() < 0.3) {
+            showHelperSpeech(helperData.element, helperData.type);
+        }
+    } else if (action < 0.8) {
+        // Try to interact with nearby helper
+        helperData.state = 'idle';
+        helperData.element.classList.remove('walking');
+        tryHelperInteraction(helperData);
+    } else {
+        // Just idle
+        helperData.state = 'idle';
+        helperData.element.classList.remove('walking');
+    }
+}
+
+function moveHelper(helperData) {
+    const diff = helperData.targetX - helperData.x;
+
+    if (Math.abs(diff) < 1) {
+        // Arrived
+        helperData.state = 'idle';
+        helperData.element.classList.remove('walking');
+        return;
+    }
+
+    // Move towards target
+    helperData.x += Math.sign(diff) * helperData.speed;
+    helperData.element.style.left = helperData.x + '%';
+}
+
+function tryHelperInteraction(helperData) {
+    // Find nearby helper
+    const nearby = helperSystem.helpers.find(other => {
+        if (other === helperData) return false;
+        const dist = Math.abs(other.x - helperData.x);
+        return dist < 15;
+    });
+
+    if (nearby) {
+        // Show hearts!
+        helperData.element.classList.add('hearts');
+        nearby.element.classList.add('hearts');
+
+        setTimeout(() => {
+            helperData.element.classList.remove('hearts');
+            nearby.element.classList.remove('hearts');
+        }, 1000);
+
+        // Both say something
+        showHelperSpeech(helperData.element, helperData.type);
+        setTimeout(() => {
+            showHelperSpeech(nearby.element, nearby.type);
+        }, 300);
+
+        if (window.partyAudio) window.partyAudio.playSparkle();
+    }
+}
+
+function addHelper(upgrade) {
+    if (helperSystem.helpers.length >= helperSystem.maxHelpers) return;
+
+    const helperData = createInteractiveHelper(upgrade, helperSystem.helpers.length);
+    if (helperData) {
+        helperSystem.helpers.push(helperData);
+    }
+
+    // Start update loop if not running
+    if (!helperSystem.updateInterval) {
+        helperSystem.updateInterval = setInterval(updateHelpers, 100);
+    }
 }
 
 function loadHelpers() {
@@ -512,18 +701,86 @@ function loadHelpers() {
     if (!helpersArea) return;
 
     helpersArea.innerHTML = '';
+    helperSystem.helpers = [];
 
     let count = 0;
     UPGRADES.helpers.forEach(upgrade => {
         const level = gameState.upgrades[upgrade.id] || 0;
-        for (let i = 0; i < Math.min(level, 2) && count < 8; i++) {
-            const helper = document.createElement('div');
-            helper.className = `helper ${upgrade.helperType}`;
-            helper.textContent = upgrade.icon;
-            helpersArea.appendChild(helper);
-            count++;
+        for (let i = 0; i < Math.min(level, 2) && count < helperSystem.maxHelpers; i++) {
+            const helperData = createInteractiveHelper(upgrade, count);
+            if (helperData) {
+                helperSystem.helpers.push(helperData);
+                count++;
+            }
         }
     });
+
+    // Start update loop
+    if (helperSystem.helpers.length > 0 && !helperSystem.updateInterval) {
+        helperSystem.updateInterval = setInterval(updateHelpers, 100);
+    }
+
+    // Add party elements
+    addPartyElements();
+}
+
+// ==========================================
+// PARTY SCENE ELEMENTS
+// ==========================================
+
+function addPartyElements() {
+    const scene = document.getElementById('partyScene');
+    if (!scene) return;
+
+    // Remove old party elements
+    scene.querySelectorAll('.party-element').forEach(el => el.remove());
+
+    // Add floating balloons based on decorations
+    const balloonLevel = gameState.upgrades['balloon1'] || 0;
+    for (let i = 0; i < Math.min(balloonLevel, 5); i++) {
+        const balloon = document.createElement('div');
+        balloon.className = 'party-element floating-balloon';
+        balloon.textContent = ['🎈', '🎈', '🎈', '🎀', '🎁'][i % 5];
+        balloon.style.left = (10 + i * 18) + '%';
+        balloon.style.top = (5 + Math.random() * 20) + '%';
+        balloon.style.animationDelay = (i * 0.5) + 's';
+        scene.appendChild(balloon);
+    }
+
+    // Add disco lights if disco ball owned
+    const discoLevel = gameState.upgrades['disco1'] || 0;
+    if (discoLevel > 0) {
+        for (let i = 0; i < Math.min(discoLevel, 3); i++) {
+            const light = document.createElement('div');
+            light.className = 'party-element disco-light';
+            light.style.left = (20 + i * 30) + '%';
+            light.style.top = '20%';
+            light.style.animationDelay = (i * 1) + 's';
+            scene.appendChild(light);
+        }
+    }
+
+    // Add confetti if confetti cannon owned
+    const confettiLevel = gameState.upgrades['confetti1'] || 0;
+    if (confettiLevel > 0) {
+        setInterval(() => {
+            if (Math.random() < 0.3) {
+                createSceneConfetti(scene);
+            }
+        }, 500);
+    }
+}
+
+function createSceneConfetti(scene) {
+    const confetti = document.createElement('div');
+    confetti.className = 'party-element confetti-piece';
+    confetti.style.left = (10 + Math.random() * 80) + '%';
+    confetti.style.top = '10%';
+    confetti.style.background = ['#e91e8c', '#9b59b6', '#3498db', '#f39c12', '#2ecc71'][Math.floor(Math.random() * 5)];
+    confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+
+    scene.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 4000);
 }
 
 // ==========================================
@@ -535,7 +792,7 @@ function addDecoration(upgrade) {
     if (!layer) return;
 
     const existing = layer.querySelectorAll('.decoration');
-    if (existing.length >= 12) return;
+    if (existing.length >= 15) return;
 
     const deco = document.createElement('div');
     deco.className = 'decoration';
@@ -543,8 +800,12 @@ function addDecoration(upgrade) {
     deco.style.left = (10 + Math.random() * 80) + '%';
     deco.style.top = (5 + Math.random() * 30) + '%';
     deco.style.animationDelay = Math.random() * 2 + 's';
+    deco.style.fontSize = (1.5 + Math.random()) + 'rem';
 
     layer.appendChild(deco);
+
+    // Refresh party elements
+    addPartyElements();
 }
 
 function loadDecorations() {
@@ -556,13 +817,14 @@ function loadDecorations() {
     let count = 0;
     UPGRADES.decorations.forEach(upgrade => {
         const level = gameState.upgrades[upgrade.id] || 0;
-        for (let i = 0; i < Math.min(level, 2) && count < 12; i++) {
+        for (let i = 0; i < Math.min(level, 2) && count < 15; i++) {
             const deco = document.createElement('div');
             deco.className = 'decoration';
             deco.textContent = upgrade.icon;
             deco.style.left = (10 + Math.random() * 80) + '%';
             deco.style.top = (5 + Math.random() * 30) + '%';
             deco.style.animationDelay = Math.random() * 2 + 's';
+            deco.style.fontSize = (1.5 + Math.random()) + 'rem';
             layer.appendChild(deco);
             count++;
         }

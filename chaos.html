@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CHAOS MODE!</title>
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/games.css">
+    <link rel="stylesheet" href="css/chaos.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌪️</text></svg>">
 </head>
 <body class="chaos-page">
@@ -14,25 +14,60 @@
         <span>Back</span>
     </a>
 
-    <main class="game-page chaos-page">
-        <div class="game-header">
+    <main class="chaos-main">
+        <div class="chaos-header">
             <h1 id="chaosTitle">🌪️ CHAOS MODE! 🌪️</h1>
-            <p>Pure silly fun! No rules, just chaos!</p>
+            <p>Draw, spawn, and go WILD!</p>
         </div>
 
-        <div class="game-container">
-            <div class="game-area chaos-area" id="chaosArea">
-                <!-- Chaos elements will spawn here -->
+        <!-- Drawing Canvas -->
+        <div class="chaos-canvas-container">
+            <canvas id="chaosCanvas"></canvas>
+            <div class="chaos-elements" id="chaosElements"></div>
+        </div>
+
+        <!-- Drawing Controls -->
+        <div class="drawing-controls">
+            <div class="control-group colors">
+                <span class="control-label">🎨 Color:</span>
+                <div class="color-buttons">
+                    <button class="color-btn active" data-color="#e91e8c" style="background:#e91e8c"></button>
+                    <button class="color-btn" data-color="#9b59b6" style="background:#9b59b6"></button>
+                    <button class="color-btn" data-color="#3498db" style="background:#3498db"></button>
+                    <button class="color-btn" data-color="#2ecc71" style="background:#2ecc71"></button>
+                    <button class="color-btn" data-color="#f39c12" style="background:#f39c12"></button>
+                    <button class="color-btn" data-color="#e74c3c" style="background:#e74c3c"></button>
+                    <button class="color-btn" data-color="#ffffff" style="background:#ffffff"></button>
+                    <button class="color-btn rainbow" data-color="rainbow" title="Rainbow!">🌈</button>
+                </div>
+            </div>
+
+            <div class="control-group size">
+                <span class="control-label">✏️ Size: <span id="sizeValue">10</span></span>
+                <input type="range" id="brushSize" min="2" max="50" value="10" class="size-slider">
+            </div>
+
+            <div class="control-group tools">
+                <button class="tool-btn active" data-tool="brush" title="Brush">🖌️</button>
+                <button class="tool-btn" data-tool="spray" title="Spray">💨</button>
+                <button class="tool-btn" data-tool="stars" title="Stars">⭐</button>
+                <button class="tool-btn" data-tool="emoji" title="Emoji Stamp">😜</button>
             </div>
         </div>
 
+        <!-- Chaos Controls -->
         <div class="chaos-controls">
-            <button class="chaos-btn" id="btnSpawn" title="Spawn More!">➕</button>
-            <button class="chaos-btn" id="btnRainbow" title="Rainbow!">🌈</button>
+            <button class="chaos-btn" id="btnSpawn" title="Spawn Stuff!">🎁</button>
+            <button class="chaos-btn" id="btnExplode" title="Explosion!">💥</button>
+            <button class="chaos-btn" id="btnRainbow" title="Rainbow Mode!">🌈</button>
             <button class="chaos-btn" id="btnConfetti" title="Confetti!">🎊</button>
-            <button class="chaos-btn" id="btnSound" title="Sounds!">🔊</button>
-            <button class="chaos-btn" id="btnClear" title="Clear">🗑️</button>
+            <button class="chaos-btn" id="btnWobble" title="Wobble!">🫨</button>
+            <button class="chaos-btn" id="btnSound" title="Silly Sounds!">🔊</button>
+            <button class="chaos-btn" id="btnClear" title="Clear All">🗑️</button>
         </div>
+
+        <!-- Random Popup Container -->
+        <div class="random-popups" id="randomPopups"></div>
     </main>
 
     <script src="js/audio.js"></script>
