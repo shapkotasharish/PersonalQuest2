@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch the Cakes!</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/games.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍰</text></svg>">
+</head>
+<body>
+    <a href="hub.html" class="back-btn" id="backBtn">
+        <span>←</span>
+        <span>Back</span>
+    </a>
+
+    <main class="game-page">
+        <div class="game-header">
+            <h1>🍰 Catch the Cakes!</h1>
+            <div class="game-stats">
+                <div class="stat">
+                    <span class="stat-label">Score</span>
+                    <span class="stat-value" id="score">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">High Score</span>
+                    <span class="stat-value" id="highScore">0</span>
+                </div>
+                <div class="stat lives">
+                    <span class="stat-label">Lives</span>
+                    <span class="stat-value" id="lives">❤️❤️❤️</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container" id="gameContainer">
+            <div class="game-area cakes-area" id="gameArea">
+                <div class="catcher" id="catcher">🧺</div>
+            </div>
+
+            <div class="game-overlay" id="gameOverlay">
+                <div class="overlay-content">
+                    <h2 id="overlayTitle">Ready?</h2>
+                    <p id="overlayText">Catch the falling cakes!</p>
+                    <button class="btn btn-primary" id="startBtn">Start Game</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/audio.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/cakes.js"></script>
+</body>
+</html>

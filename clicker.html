@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party Power Clicker!</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/clicker.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎂</text></svg>">
+</head>
+<body>
+    <!-- Back Button -->
+    <a href="hub.html" class="back-btn" id="backBtn">
+        <span>←</span>
+        <span>Back</span>
+    </a>
+
+    <!-- Main Game Container -->
+    <main class="clicker-game">
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item main-stat">
+                <span class="stat-icon">🎉</span>
+                <span class="stat-label">Party Power</span>
+                <span class="stat-value" id="partyPower">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">⚡</span>
+                <span class="stat-label">Per Second</span>
+                <span class="stat-value" id="perSecond">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">👆</span>
+                <span class="stat-label">Per Click</span>
+                <span class="stat-value" id="perClick">1</span>
+            </div>
+            <div class="stat-item rebirth-stat">
+                <span class="stat-icon">⭐</span>
+                <span class="stat-label">Party Stars</span>
+                <span class="stat-value" id="partyStars">0</span>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area">
+            <!-- Party Scene -->
+            <div class="party-scene" id="partyScene">
+                <!-- Decorations Container -->
+                <div class="decorations-layer" id="decorationsLayer"></div>
+
+                <!-- Dance Floor -->
+                <div class="dance-floor" id="danceFloor"></div>
+
+                <!-- Main Clickable Cake -->
+                <div class="main-cake-container">
+                    <div class="cake-glow"></div>
+                    <div class="main-cake" id="mainCake">🎂</div>
+                    <div class="cake-sparkles" id="cakeSparkles"></div>
+                </div>
+
+                <!-- Helpers Area -->
+                <div class="helpers-area" id="helpersArea"></div>
+            </div>
+
+            <!-- Upgrades Panel -->
+            <div class="upgrades-panel">
+                <div class="panel-header">
+                    <h2>🛍️ Shop</h2>
+                </div>
+
+                <!-- Category Tabs -->
+                <div class="upgrade-tabs">
+                    <button class="tab-btn active" data-tab="clicking">👆 Clicking</button>
+                    <button class="tab-btn" data-tab="helpers">🐾 Helpers</button>
+                    <button class="tab-btn" data-tab="decorations">🎈 Decor</button>
+                    <button class="tab-btn" data-tab="boosts">✨ Boosts</button>
+                    <button class="tab-btn" data-tab="themes">🎨 Themes</button>
+                </div>
+
+                <!-- Upgrade Lists -->
+                <div class="upgrades-container" id="upgradesContainer">
+                    <!-- Clicking Upgrades -->
+                    <div class="upgrade-list active" data-category="clicking" id="clickingUpgrades"></div>
+
+                    <!-- Helpers Upgrades -->
+                    <div class="upgrade-list" data-category="helpers" id="helpersUpgrades"></div>
+
+                    <!-- Decorations Upgrades -->
+                    <div class="upgrade-list" data-category="decorations" id="decorationsUpgrades"></div>
+
+                    <!-- Boosts Upgrades -->
+                    <div class="upgrade-list" data-category="boosts" id="boostsUpgrades"></div>
+
+                    <!-- Themes -->
+                    <div class="upgrade-list" data-category="themes" id="themesUpgrades"></div>
+                </div>
+
+                <!-- Rebirth Button -->
+                <div class="rebirth-section">
+                    <button class="btn rebirth-btn" id="rebirthBtn" disabled>
+                        <span>⭐ Party Rebirth</span>
+                        <span class="rebirth-info" id="rebirthInfo">Need 1M Party Power</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Achievement Popup -->
+    <div class="achievement-popup" id="achievementPopup">
+        <div class="achievement-content">
+            <span class="achievement-icon" id="achievementIcon">🏆</span>
+            <span class="achievement-text" id="achievementText">Achievement Unlocked!</span>
+        </div>
+    </div>
+
+    <script src="js/audio.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/clicker.js"></script>
+</body>
+</html>

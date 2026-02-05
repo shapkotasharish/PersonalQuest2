@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/landing.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎂</text></svg>">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <p style="margin-top: 1rem; font-family: var(--font-heading);">Loading the party...</p>
+    </div>
+
+    <!-- Main Content -->
+    <main class="landing-page">
+        <!-- Background Elements -->
+        <div class="bg-stars"></div>
+        <div class="bg-gradient-overlay"></div>
+
+        <!-- Balloons Container -->
+        <div class="balloons-container" id="balloonsContainer"></div>
+
+        <!-- Peek-a-boo Characters -->
+        <div class="peek-characters" id="peekCharacters"></div>
+
+        <!-- Center Content -->
+        <div class="landing-content">
+            <div class="title-container">
+                <h1 class="main-title">
+                    <span class="title-word">Happy</span>
+                    <span class="title-word">Birthday</span>
+                    <span class="title-word">Naavya!</span>
+                    <span class="cake-emoji">🎂</span>
+                </h1>
+            </div>
+
+            <p class="subtitle">
+                <span class="level-badge">Level 9 unlocked!</span>
+                <span class="emoji-group">🚀🎈</span>
+            </p>
+
+            <button class="btn btn-primary btn-pulse play-btn" id="playBtn">
+                <span class="btn-icon">🎮</span>
+                <span class="btn-text">Play Games</span>
+            </button>
+        </div>
+
+        <!-- Decorative Elements -->
+        <div class="decorative-elements">
+            <div class="floating-cake cake-1">🎂</div>
+            <div class="floating-cake cake-2">🧁</div>
+            <div class="floating-present present-1">🎁</div>
+            <div class="floating-present present-2">🎀</div>
+            <div class="floating-star star-1">⭐</div>
+            <div class="floating-star star-2">✨</div>
+            <div class="floating-star star-3">🌟</div>
+        </div>
+    </main>
+
+    <!-- Screen Glow Effect -->
+    <div class="screen-glow"></div>
+
+    <script src="js/audio.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/landing.js"></script>
+</body>
+</html>

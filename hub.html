@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose a Game!</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/hub.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+</head>
+<body>
+    <!-- Back Button -->
+    <a href="index.html" class="back-btn" id="backBtn">
+        <span>←</span>
+        <span>Back</span>
+    </a>
+
+    <!-- Main Content -->
+    <main class="hub-page">
+        <header class="hub-header">
+            <h1>🎉 Choose a Game</h1>
+            <p class="hub-subtitle">Pick your adventure!</p>
+        </header>
+
+        <div class="games-grid">
+            <!-- Party Power Clicker -->
+            <div class="game-card" data-game="clicker">
+                <div class="card-icon">🎂</div>
+                <div class="card-content">
+                    <h2>Party Power Clicker</h2>
+                    <p>Build the ultimate birthday party!</p>
+                    <div class="card-badge main-game">Main Game</div>
+                </div>
+                <div class="card-glow"></div>
+            </div>
+
+            <!-- Catch the Falling Cakes -->
+            <div class="game-card" data-game="cakes">
+                <div class="card-icon">🍰</div>
+                <div class="card-content">
+                    <h2>Catch the Cakes</h2>
+                    <p>Don't let them fall!</p>
+                    <div class="card-badge arcade">Arcade</div>
+                </div>
+                <div class="card-glow"></div>
+            </div>
+
+            <!-- Birthday Whack-A-Thing -->
+            <div class="game-card" data-game="whack">
+                <div class="card-icon">🎯</div>
+                <div class="card-content">
+                    <h2>Whack-A-Thing</h2>
+                    <p>Test your reflexes!</p>
+                    <div class="card-badge arcade">Arcade</div>
+                </div>
+                <div class="card-glow"></div>
+            </div>
+
+            <!-- Easter Egg Hunt -->
+            <div class="game-card" data-game="eggs">
+                <div class="card-icon">🥚</div>
+                <div class="card-content">
+                    <h2>Egg Hunt</h2>
+                    <p>Find all hidden eggs!</p>
+                    <div class="card-badge special">Special</div>
+                </div>
+                <div class="card-glow"></div>
+            </div>
+
+            <!-- Chaos Mode -->
+            <div class="game-card" data-game="chaos">
+                <div class="card-icon chaos-icon">🌪️</div>
+                <div class="card-content">
+                    <h2>Chaos Mode</h2>
+                    <p>Pure silly fun!</p>
+                    <div class="card-badge chaos">Wild</div>
+                </div>
+                <div class="card-glow"></div>
+            </div>
+        </div>
+
+        <!-- Decorative Elements -->
+        <div class="hub-decorations">
+            <div class="floating-emoji e1">🎈</div>
+            <div class="floating-emoji e2">🎁</div>
+            <div class="floating-emoji e3">⭐</div>
+            <div class="floating-emoji e4">🎀</div>
+            <div class="floating-emoji e5">✨</div>
+        </div>
+    </main>
+
+    <script src="js/audio.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/hub.js"></script>
+</body>
+</html>

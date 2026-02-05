@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whack-A-Thing!</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/games.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+</head>
+<body>
+    <a href="hub.html" class="back-btn" id="backBtn">
+        <span>←</span>
+        <span>Back</span>
+    </a>
+
+    <main class="game-page">
+        <div class="game-header">
+            <h1>🎯 Whack-A-Thing!</h1>
+            <div class="game-stats">
+                <div class="stat">
+                    <span class="stat-label">Score</span>
+                    <span class="stat-value" id="score">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">High Score</span>
+                    <span class="stat-value" id="highScore">0</span>
+                </div>
+                <div class="stat lives">
+                    <span class="stat-label">Lives</span>
+                    <span class="stat-value" id="lives">❤️❤️❤️</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container" id="gameContainer">
+            <div class="game-area whack-area" id="gameArea">
+                <!-- 9 holes in a 3x3 grid -->
+                <div class="whack-hole" data-index="0"><div class="whack-target"></div></div>
+                <div class="whack-hole" data-index="1"><div class="whack-target"></div></div>
+                <div class="whack-hole" data-index="2"><div class="whack-target"></div></div>
+                <div class="whack-hole" data-index="3"><div class="whack-target"></div></div>
+                <div class="whack-hole" data-index="4"><div class="whack-target"></div></div>
+                <div class="whack-hole" data-index="5"><div class="whack-target"></div></div>
+                <div class="whack-hole" data-index="6"><div class="whack-target"></div></div>
+                <div class="whack-hole" data-index="7"><div class="whack-target"></div></div>
+                <div class="whack-hole" data-index="8"><div class="whack-target"></div></div>
+            </div>
+
+            <div class="game-overlay" id="gameOverlay">
+                <div class="overlay-content">
+                    <h2 id="overlayTitle">Ready?</h2>
+                    <p id="overlayText">Whack the cute animals!<br>Avoid the silly objects!</p>
+                    <button class="btn btn-primary" id="startBtn">Start Game</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/audio.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/whack.js"></script>
+</body>
+</html>

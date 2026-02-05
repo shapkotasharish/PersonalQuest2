@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHAOS MODE!</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/games.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌪️</text></svg>">
+</head>
+<body class="chaos-page">
+    <a href="hub.html" class="back-btn" id="backBtn">
+        <span>←</span>
+        <span>Back</span>
+    </a>
+
+    <main class="game-page chaos-page">
+        <div class="game-header">
+            <h1 id="chaosTitle">🌪️ CHAOS MODE! 🌪️</h1>
+            <p>Pure silly fun! No rules, just chaos!</p>
+        </div>
+
+        <div class="game-container">
+            <div class="game-area chaos-area" id="chaosArea">
+                <!-- Chaos elements will spawn here -->
+            </div>
+        </div>
+
+        <div class="chaos-controls">
+            <button class="chaos-btn" id="btnSpawn" title="Spawn More!">➕</button>
+            <button class="chaos-btn" id="btnRainbow" title="Rainbow!">🌈</button>
+            <button class="chaos-btn" id="btnConfetti" title="Confetti!">🎊</button>
+            <button class="chaos-btn" id="btnSound" title="Sounds!">🔊</button>
+            <button class="chaos-btn" id="btnClear" title="Clear">🗑️</button>
+        </div>
+    </main>
+
+    <script src="js/audio.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/chaos.js"></script>
+</body>
+</html>
