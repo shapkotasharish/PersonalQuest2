@@ -84,8 +84,8 @@
         );
     border-radius: var(--radius-xl);
     overflow: hidden;
-    min-height: 300px;
-    max-height: 450px; /* Limit vertical height for horizontal feel */
+    min-height: 400px;
+    max-height: calc(100vh - 180px); /* Fill vertical space while preventing scroll */
     border: 3px solid rgba(255, 255, 255, 0.1);
     box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.2);
 }
