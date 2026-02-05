@@ -97,6 +97,14 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGame();
     initGame();
     startGameLoop();
+
+    // Ensure helpers and decorations are loaded after everything is initialized
+    // This handles both fresh loads and returning to the page
+    setTimeout(() => {
+        loadHelpers();
+        loadDecorations();
+        loadTheme();
+    }, 150);
 });
 
 function initGame() {

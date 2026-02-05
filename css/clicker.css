@@ -214,6 +214,73 @@
     50% { transform: translateY(-8px) rotate(5deg); }
 }
 
+/* Disco ball - always visible base decoration */
+.disco-ball-container {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    pointer-events: none;
+}
+
+.disco-ball {
+    font-size: 3rem;
+    animation: disco-spin 4s linear infinite;
+    filter: drop-shadow(0 5px 15px rgba(255, 255, 255, 0.4));
+}
+
+@keyframes disco-spin {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+}
+
+/* Light beams from disco ball */
+.disco-light-beam {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 4px;
+    height: 150px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, transparent 100%);
+    transform-origin: top center;
+    opacity: 0.4;
+    border-radius: 2px;
+}
+
+.disco-light-beam.beam-1 {
+    transform: translateX(-50%) rotate(-25deg);
+    background: linear-gradient(180deg, rgba(233, 30, 140, 0.5) 0%, transparent 100%);
+    animation: beam-sway-1 3s ease-in-out infinite;
+}
+
+.disco-light-beam.beam-2 {
+    transform: translateX(-50%) rotate(0deg);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, transparent 100%);
+    animation: beam-sway-2 2.5s ease-in-out infinite;
+}
+
+.disco-light-beam.beam-3 {
+    transform: translateX(-50%) rotate(25deg);
+    background: linear-gradient(180deg, rgba(52, 152, 219, 0.5) 0%, transparent 100%);
+    animation: beam-sway-3 3.5s ease-in-out infinite;
+}
+
+@keyframes beam-sway-1 {
+    0%, 100% { transform: translateX(-50%) rotate(-25deg); opacity: 0.3; }
+    50% { transform: translateX(-50%) rotate(-35deg); opacity: 0.6; }
+}
+
+@keyframes beam-sway-2 {
+    0%, 100% { transform: translateX(-50%) rotate(0deg); opacity: 0.4; }
+    50% { transform: translateX(-50%) rotate(10deg); opacity: 0.7; }
+}
+
+@keyframes beam-sway-3 {
+    0%, 100% { transform: translateX(-50%) rotate(25deg); opacity: 0.3; }
+    50% { transform: translateX(-50%) rotate(35deg); opacity: 0.6; }
+}
+
 /* Main Cake */
 .main-cake-container {
     position: absolute;
