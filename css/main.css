@@ -422,12 +422,13 @@ p {
 
 /* Easter Egg */
 .easter-egg {
-    position: absolute;
+    position: fixed;
     font-size: 1.5rem;
     cursor: pointer;
     opacity: 0.3;
     transition: all var(--transition-medium);
-    z-index: 50;
+    z-index: 1000;
+    user-select: none;
 }
 
 .easter-egg:hover {
@@ -444,6 +445,22 @@ p {
     0% { transform: scale(1); }
     50% { transform: scale(1.5); }
     100% { transform: scale(1); }
+}
+
+/* Poppable Balloons */
+.pop-balloon {
+    user-select: none;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.pop-balloon:hover {
+    transform: scale(1.2);
+}
+
+@keyframes balloon-rise {
+    0% { bottom: -50px; opacity: 1; }
+    80% { opacity: 1; }
+    100% { bottom: 110vh; opacity: 0; }
 }
 
 /* Floating Numbers */
