@@ -510,9 +510,9 @@ function purchaseUpgrade(upgrade, category) {
 
 const helperSystem = {
     helpers: [],
-    maxHelpers: 12,
+    maxHelpers: 100, // Allow many more helpers
     updateInterval: null,
-    interactionInterval: null
+    helperScale: 1 // Will shrink as more helpers are added
 };
 
 const HELPER_PHRASES = {
@@ -550,7 +550,7 @@ function getRandomHelperPosition() {
     };
 }
 
-function createInteractiveHelper(upgrade, index) {
+function createInteractiveHelper(upgrade, index, scale) {
     const helpersArea = document.getElementById('helpersArea');
     if (!helpersArea) return null;
 
@@ -565,11 +565,14 @@ function createInteractiveHelper(upgrade, index) {
     helper.style.left = startPos.x + '%';
     helper.style.top = startPos.y + '%';
 
+    // Apply scale for crowded scenes
+    helper.style.fontSize = (2.8 * scale) + 'rem';
+
     // Direction (1 = right, -1 = left)
     const dir = Math.random() > 0.5 ? 1 : -1;
     helper.style.setProperty('--dir', dir);
 
-    // Helper state
+    // Helper state - simplified for performance
     const helperData = {
         element: helper,
         x: startPos.x,
@@ -577,10 +580,10 @@ function createInteractiveHelper(upgrade, index) {
         targetX: startPos.x,
         targetY: startPos.y,
         direction: dir,
-        state: 'idle', // idle, walking, interacting
+        state: 'idle',
         type: upgrade.helperType,
-        speed: 0.2 + Math.random() * 0.15,
-        nextActionTime: Date.now() + 1000 + Math.random() * 3000
+        speed: 0.15 + Math.random() * 0.1,
+        nextActionTime: Date.now() + 2000 + Math.random() * 4000
     };
 
     // Click interaction
@@ -588,10 +591,8 @@ function createInteractiveHelper(upgrade, index) {
         helperClicked(helperData);
     });
 
-    helper.classList.add('entering');
+    // No entering animation for performance
     helpersArea.appendChild(helper);
-
-    setTimeout(() => helper.classList.remove('entering'), 500);
 
     return helperData;
 }
@@ -658,7 +659,7 @@ function updateHelpers() {
 function decideHelperAction(helperData) {
     const action = Math.random();
 
-    if (action < 0.35) {
+    if (action < 0.4) {
         // Walk to new position (avoiding center cake area)
         helperData.state = 'walking';
         const newPos = getRandomHelperPosition();
@@ -667,27 +668,22 @@ function decideHelperAction(helperData) {
         helperData.direction = helperData.targetX > helperData.x ? 1 : -1;
         helperData.element.style.setProperty('--dir', helperData.direction);
         helperData.element.classList.add('walking');
-    } else if (action < 0.45) {
-        // Random speech
+    } else if (action < 0.5) {
+        // Random speech (less frequent for performance)
         helperData.state = 'idle';
         helperData.element.classList.remove('walking');
         showHelperSpeech(helperData.element, helperData.type);
-    } else if (action < 0.55) {
-        // Try to interact with nearby helper
-        helperData.state = 'idle';
-        helperData.element.classList.remove('walking');
-        tryHelperInteraction(helperData);
-    } else if (action < 0.65) {
+    } else if (action < 0.6) {
         // Do a special action (dance, sleep, eat, etc.)
         helperData.state = 'idle';
         helperData.element.classList.remove('walking');
         doHelperSpecialAction(helperData);
-    } else if (action < 0.75) {
+    } else if (action < 0.7) {
         // Celebrate (jump and show emojis)
         helperData.state = 'idle';
         helperData.element.classList.remove('walking');
         helperCelebrate(helperData);
-    } else if (action < 0.85) {
+    } else if (action < 0.8) {
         // Look at cake (turn towards center)
         helperData.state = 'idle';
         helperData.element.classList.remove('walking');
@@ -822,14 +818,34 @@ function tryHelperInteraction(helperData) {
 function addHelper(upgrade) {
     if (helperSystem.helpers.length >= helperSystem.maxHelpers) return;
 
-    const helperData = createInteractiveHelper(upgrade, helperSystem.helpers.length);
+    // Recalculate scale with new helper
+    const totalHelpers = helperSystem.helpers.length + 1;
+    let scale = 1.0;
+    if (totalHelpers > 50) {
+        scale = 0.35;
+    } else if (totalHelpers > 30) {
+        scale = 0.45;
+    } else if (totalHelpers > 15) {
+        scale = 0.6;
+    } else if (totalHelpers > 5) {
+        scale = 0.8;
+    }
+
+    // If scale changed significantly, reload all helpers to resize them
+    if (Math.abs(scale - helperSystem.helperScale) > 0.1) {
+        loadHelpers();
+        return;
+    }
+
+    const helperData = createInteractiveHelper(upgrade, helperSystem.helpers.length, scale);
     if (helperData) {
         helperSystem.helpers.push(helperData);
     }
 
     // Start update loop if not running
     if (!helperSystem.updateInterval) {
-        helperSystem.updateInterval = setInterval(updateHelpers, 100);
+        const updateSpeed = totalHelpers > 30 ? 200 : (totalHelpers > 15 ? 150 : 100);
+        helperSystem.updateInterval = setInterval(updateHelpers, updateSpeed);
     }
 }
 
@@ -837,15 +853,47 @@ function loadHelpers() {
     const helpersArea = document.getElementById('helpersArea');
     if (!helpersArea) return;
 
+    // Clear existing helpers
     helpersArea.innerHTML = '';
     helperSystem.helpers = [];
 
+    // Stop existing update loop
+    if (helperSystem.updateInterval) {
+        clearInterval(helperSystem.updateInterval);
+        helperSystem.updateInterval = null;
+    }
+
+    // Count total helpers first to calculate scale
+    let totalHelpers = 0;
+    UPGRADES.helpers.forEach(upgrade => {
+        totalHelpers += gameState.upgrades[upgrade.id] || 0;
+    });
+
+    // Calculate scale - shrink helpers as more are added
+    // 1-5 helpers: full size (1.0)
+    // 6-15 helpers: medium (0.8)
+    // 16-30 helpers: small (0.6)
+    // 31-50 helpers: tiny (0.45)
+    // 50+ helpers: mini (0.35)
+    let scale = 1.0;
+    if (totalHelpers > 50) {
+        scale = 0.35;
+    } else if (totalHelpers > 30) {
+        scale = 0.45;
+    } else if (totalHelpers > 15) {
+        scale = 0.6;
+    } else if (totalHelpers > 5) {
+        scale = 0.8;
+    }
+    helperSystem.helperScale = scale;
+
+    // Create ALL helpers
     let count = 0;
     UPGRADES.helpers.forEach(upgrade => {
         const level = gameState.upgrades[upgrade.id] || 0;
-        // Show up to 2 helpers per upgrade type (keeps it from getting too crowded)
-        for (let i = 0; i < Math.min(level, 2) && count < helperSystem.maxHelpers; i++) {
-            const helperData = createInteractiveHelper(upgrade, count);
+        // Show ALL purchased helpers
+        for (let i = 0; i < level && count < helperSystem.maxHelpers; i++) {
+            const helperData = createInteractiveHelper(upgrade, count, scale);
             if (helperData) {
                 helperSystem.helpers.push(helperData);
                 count++;
@@ -853,9 +901,11 @@ function loadHelpers() {
         }
     });
 
-    // Start update loop
-    if (helperSystem.helpers.length > 0 && !helperSystem.updateInterval) {
-        helperSystem.updateInterval = setInterval(updateHelpers, 100);
+    // Start update loop with slower interval for many helpers
+    if (helperSystem.helpers.length > 0) {
+        // Slow down updates when there are many helpers
+        const updateSpeed = totalHelpers > 30 ? 200 : (totalHelpers > 15 ? 150 : 100);
+        helperSystem.updateInterval = setInterval(updateHelpers, updateSpeed);
     }
 
     // Add party elements (visual effects for other upgrades)
