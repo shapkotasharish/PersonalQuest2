@@ -35,6 +35,8 @@ class PartyAudio {
         this.currentSongIndex = -1;
         this.isPlaying = false;
         this.currentSong = null;
+        this.hasUserInteracted = false;
+        this.autoplayBlocked = false;
     }
 
     // Initialize audio context on first user interaction
@@ -72,12 +74,35 @@ class PartyAudio {
             this.updateNowPlayingUI();
         });
 
+        // Save playback position periodically for cross-page persistence
+        this.musicPlayer.addEventListener('timeupdate', () => {
+            if (this.isPlaying && this.musicPlayer.currentTime > 0) {
+                sessionStorage.setItem('partySongTime', this.musicPlayer.currentTime.toString());
+            }
+        });
+
         // Shuffle and prepare playlist
         this.shufflePlaylist();
     }
 
     // Shuffle the playlist
     shufflePlaylist() {
+        // Check if we have a saved playlist order from sessionStorage
+        const savedPlaylist = sessionStorage.getItem('partyPlaylist');
+        const savedIndex = sessionStorage.getItem('partySongIndex');
+        const savedTime = sessionStorage.getItem('partySongTime');
+
+        if (savedPlaylist) {
+            try {
+                this.playlist = JSON.parse(savedPlaylist);
+                this.currentSongIndex = savedIndex ? parseInt(savedIndex) - 1 : -1;
+                this.savedTime = savedTime ? parseFloat(savedTime) : 0;
+                return;
+            } catch (e) {
+                // Fall through to normal shuffle
+            }
+        }
+
         this.playlist = [...SONG_LIBRARY];
         // Fisher-Yates shuffle
         for (let i = this.playlist.length - 1; i > 0; i--) {
@@ -85,6 +110,10 @@ class PartyAudio {
             [this.playlist[i], this.playlist[j]] = [this.playlist[j], this.playlist[i]];
         }
         this.currentSongIndex = -1;
+        this.savedTime = 0;
+
+        // Save the shuffled playlist
+        sessionStorage.setItem('partyPlaylist', JSON.stringify(this.playlist));
     }
 
     // Start playing music
@@ -101,7 +130,14 @@ class PartyAudio {
 
         // If we've played all songs, reshuffle
         if (this.currentSongIndex >= this.playlist.length) {
-            this.shufflePlaylist();
+            // Clear saved playlist to get a fresh shuffle
+            sessionStorage.removeItem('partyPlaylist');
+            this.playlist = [...SONG_LIBRARY];
+            for (let i = this.playlist.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [this.playlist[i], this.playlist[j]] = [this.playlist[j], this.playlist[i]];
+            }
+            sessionStorage.setItem('partyPlaylist', JSON.stringify(this.playlist));
             this.currentSongIndex = 0;
         }
 
@@ -111,13 +147,25 @@ class PartyAudio {
         this.musicPlayer.src = songPath;
         this.musicPlayer.volume = this.isMuted ? 0 : this.musicVolume;
 
+        // Save current state
+        sessionStorage.setItem('partySongIndex', this.currentSongIndex.toString());
+
         this.musicPlayer.play().then(() => {
             this.isPlaying = true;
+            this.autoplayBlocked = false;
+
+            // Restore saved position if we have one
+            if (this.savedTime && this.savedTime > 0) {
+                this.musicPlayer.currentTime = this.savedTime;
+                this.savedTime = 0;
+            }
+
             this.updateNowPlayingUI();
         }).catch(e => {
             console.warn('Could not play music:', e);
-            // Try next song if this one fails
-            setTimeout(() => this.playNextSong(), 1000);
+            this.autoplayBlocked = true;
+            this.updateNowPlayingUI();
+            // Don't auto-retry, wait for user interaction
         });
     }
 
@@ -426,10 +474,13 @@ function createNowPlayingUI() {
     // Check if already exists
     if (document.getElementById('nowPlaying')) return;
 
+    const isCollapsed = localStorage.getItem('npCollapsed') === 'true';
+
     const container = document.createElement('div');
     container.id = 'nowPlaying';
-    container.className = 'now-playing';
+    container.className = 'now-playing visible' + (isCollapsed ? ' collapsed' : '');
     container.innerHTML = `
+        <button class="np-collapse" title="Collapse">◀</button>
         <div class="np-bars">
             <div class="np-bar"></div>
             <div class="np-bar"></div>
@@ -438,10 +489,17 @@ function createNowPlayingUI() {
             <div class="np-bar"></div>
         </div>
         <div class="np-info">
-            <div class="np-title">Loading...</div>
+            <div class="np-title">Click to play music!</div>
         </div>
         <button class="np-skip" title="Skip">⏭️</button>
     `;
+
+    // Collapse button
+    container.querySelector('.np-collapse').addEventListener('click', (e) => {
+        e.stopPropagation();
+        container.classList.toggle('collapsed');
+        localStorage.setItem('npCollapsed', container.classList.contains('collapsed'));
+    });
 
     // Skip button
     container.querySelector('.np-skip').addEventListener('click', (e) => {
@@ -452,10 +510,18 @@ function createNowPlayingUI() {
         }
     });
 
-    // Click to toggle play/pause
-    container.addEventListener('click', () => {
+    // Click to toggle play/pause (or start if autoplay was blocked)
+    container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('np-collapse') || e.target.classList.contains('np-skip')) return;
+
         if (window.partyAudio) {
-            window.partyAudio.toggleMusic();
+            // If music hasn't started yet (autoplay blocked), start it
+            if (window.partyAudio.autoplayBlocked || !window.partyAudio.isPlaying) {
+                window.partyAudio.init();
+                window.partyAudio.startMusic();
+            } else {
+                window.partyAudio.toggleMusic();
+            }
         }
     });
 
@@ -484,23 +550,54 @@ function addNowPlayingStyles() {
             gap: 14px;
             z-index: 1000;
             cursor: pointer;
-            opacity: 0;
-            transform: translateX(100px);
+            opacity: 1;
+            transform: translateX(0);
             transition: all 0.3s ease;
             border: 3px solid rgba(255, 255, 255, 0.15);
             max-width: 320px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .now-playing.visible {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
         .now-playing:hover {
             background: rgba(0, 0, 0, 0.85);
             border-color: var(--song-color, #e91e8c);
             box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4), 0 0 20px var(--song-color, #e91e8c);
+        }
+
+        /* Collapse button */
+        .np-collapse {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 4px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .np-collapse:hover {
+            color: white;
+            transform: scale(1.2);
+        }
+
+        /* Collapsed state */
+        .now-playing.collapsed {
+            padding: 10px 14px;
+            max-width: 80px;
+        }
+
+        .now-playing.collapsed .np-info,
+        .now-playing.collapsed .np-skip {
+            display: none;
+        }
+
+        .now-playing.collapsed .np-collapse {
+            transform: rotate(180deg);
+        }
+
+        .now-playing.collapsed:hover .np-collapse {
+            transform: rotate(180deg) scale(1.2);
         }
 
         /* Music bars animation */
@@ -586,6 +683,11 @@ function addNowPlayingStyles() {
                 padding: 10px 14px;
             }
 
+            .now-playing.collapsed {
+                max-width: 70px;
+                padding: 8px 12px;
+            }
+
             .np-title {
                 font-size: 0.95rem;
             }
@@ -632,15 +734,32 @@ function createAudioControl() {
     return control;
 }
 
-// Auto-initialize on first interaction
-document.addEventListener('click', function initOnClick() {
-    window.partyAudio.init();
-    window.partyAudio.startMusic();
-    document.removeEventListener('click', initOnClick);
-}, { once: true });
+// Auto-initialize and show UI on page load
+document.addEventListener('DOMContentLoaded', () => {
+    // Create the now-playing UI immediately
+    createNowPlayingUI();
 
-document.addEventListener('touchstart', function initOnTouch() {
+    // Try to initialize and play music
     window.partyAudio.init();
     window.partyAudio.startMusic();
-    document.removeEventListener('touchstart', initOnTouch);
-}, { once: true });
+});
+
+// Also try on window load in case DOMContentLoaded already fired
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    createNowPlayingUI();
+    window.partyAudio.init();
+    window.partyAudio.startMusic();
+}
+
+// Handle user interaction to resume if autoplay was blocked
+function handleUserInteraction() {
+    if (window.partyAudio && window.partyAudio.autoplayBlocked) {
+        window.partyAudio.init();
+        window.partyAudio.startMusic();
+    }
+    document.removeEventListener('click', handleUserInteraction);
+    document.removeEventListener('touchstart', handleUserInteraction);
+}
+
+document.addEventListener('click', handleUserInteraction);
+document.addEventListener('touchstart', handleUserInteraction);
