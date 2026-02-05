@@ -473,6 +473,16 @@ function purchaseUpgrade(upgrade, category) {
         addDecoration(upgrade);
     }
 
+    // Special handling for clicking upgrades - add visual effects
+    if (category === 'clicking') {
+        addPartyElements(); // Refresh power ring and golden hour effect
+    }
+
+    // Special handling for boosts - add orb effects
+    if (category === 'boosts') {
+        addPartyElements(); // Refresh boost orbs
+    }
+
     // Special handling for themes
     if (category === 'themes' && upgrade.themeClass) {
         unlockTheme(upgrade);
@@ -505,6 +515,24 @@ const HELPER_PHRASES = {
     special: ['Sparkle!', 'Magic!', '✨✨✨', 'Woooow!', '*glitters*', 'Amazing!']
 };
 
+// Get a random position that avoids the center (where cake is)
+function getRandomHelperPosition() {
+    // The cake is in the center, so we create zones around it
+    // Helpers can be in corners and edges, avoiding center 30-70% area
+    const zones = [
+        { minX: 5, maxX: 25, minY: 10, maxY: 90 },   // Left side
+        { minX: 75, maxX: 95, minY: 10, maxY: 90 },  // Right side
+        { minX: 25, maxX: 75, minY: 5, maxY: 25 },   // Top
+        { minX: 25, maxX: 75, minY: 75, maxY: 95 },  // Bottom
+    ];
+
+    const zone = zones[Math.floor(Math.random() * zones.length)];
+    return {
+        x: zone.minX + Math.random() * (zone.maxX - zone.minX),
+        y: zone.minY + Math.random() * (zone.maxY - zone.minY)
+    };
+}
+
 function createInteractiveHelper(upgrade, index) {
     const helpersArea = document.getElementById('helpersArea');
     if (!helpersArea) return null;
@@ -515,11 +543,10 @@ function createInteractiveHelper(upgrade, index) {
     helper.dataset.type = upgrade.helperType;
     helper.dataset.id = `helper-${Date.now()}-${index}`;
 
-    // Random starting position
-    const startX = 10 + Math.random() * 80;
-    const startY = 60 + Math.random() * 30;
-    helper.style.left = startX + '%';
-    helper.style.bottom = (100 - startY) + '%';
+    // Random starting position (avoiding cake in center)
+    const startPos = getRandomHelperPosition();
+    helper.style.left = startPos.x + '%';
+    helper.style.top = startPos.y + '%';
 
     // Direction (1 = right, -1 = left)
     const dir = Math.random() > 0.5 ? 1 : -1;
@@ -528,13 +555,14 @@ function createInteractiveHelper(upgrade, index) {
     // Helper state
     const helperData = {
         element: helper,
-        x: startX,
-        y: startY,
-        targetX: startX,
+        x: startPos.x,
+        y: startPos.y,
+        targetX: startPos.x,
+        targetY: startPos.y,
         direction: dir,
         state: 'idle', // idle, walking, interacting
         type: upgrade.helperType,
-        speed: 0.3 + Math.random() * 0.2,
+        speed: 0.2 + Math.random() * 0.15,
         nextActionTime: Date.now() + 1000 + Math.random() * 3000
     };
 
@@ -613,21 +641,23 @@ function updateHelpers() {
 function decideHelperAction(helperData) {
     const action = Math.random();
 
-    if (action < 0.4) {
-        // Walk to new position
+    if (action < 0.5) {
+        // Walk to new position (avoiding center cake area)
         helperData.state = 'walking';
-        helperData.targetX = 10 + Math.random() * 80;
+        const newPos = getRandomHelperPosition();
+        helperData.targetX = newPos.x;
+        helperData.targetY = newPos.y;
         helperData.direction = helperData.targetX > helperData.x ? 1 : -1;
         helperData.element.style.setProperty('--dir', helperData.direction);
         helperData.element.classList.add('walking');
-    } else if (action < 0.6) {
+    } else if (action < 0.65) {
         // Random speech
         helperData.state = 'idle';
         helperData.element.classList.remove('walking');
-        if (Math.random() < 0.3) {
+        if (Math.random() < 0.4) {
             showHelperSpeech(helperData.element, helperData.type);
         }
-    } else if (action < 0.8) {
+    } else if (action < 0.85) {
         // Try to interact with nearby helper
         helperData.state = 'idle';
         helperData.element.classList.remove('walking');
@@ -640,26 +670,41 @@ function decideHelperAction(helperData) {
 }
 
 function moveHelper(helperData) {
-    const diff = helperData.targetX - helperData.x;
+    const diffX = helperData.targetX - helperData.x;
+    const diffY = helperData.targetY - helperData.y;
+    const dist = Math.sqrt(diffX * diffX + diffY * diffY);
 
-    if (Math.abs(diff) < 1) {
+    if (dist < 1) {
         // Arrived
         helperData.state = 'idle';
         helperData.element.classList.remove('walking');
         return;
     }
 
-    // Move towards target
-    helperData.x += Math.sign(diff) * helperData.speed;
+    // Move towards target (normalized direction)
+    const moveX = (diffX / dist) * helperData.speed;
+    const moveY = (diffY / dist) * helperData.speed;
+
+    helperData.x += moveX;
+    helperData.y += moveY;
     helperData.element.style.left = helperData.x + '%';
+    helperData.element.style.top = helperData.y + '%';
+
+    // Update direction based on horizontal movement
+    if (Math.abs(diffX) > 0.5) {
+        helperData.direction = diffX > 0 ? 1 : -1;
+        helperData.element.style.setProperty('--dir', helperData.direction);
+    }
 }
 
 function tryHelperInteraction(helperData) {
-    // Find nearby helper
+    // Find nearby helper using 2D distance
     const nearby = helperSystem.helpers.find(other => {
         if (other === helperData) return false;
-        const dist = Math.abs(other.x - helperData.x);
-        return dist < 15;
+        const dx = other.x - helperData.x;
+        const dy = other.y - helperData.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        return dist < 20;
     });
 
     if (nearby) {
@@ -706,6 +751,7 @@ function loadHelpers() {
     let count = 0;
     UPGRADES.helpers.forEach(upgrade => {
         const level = gameState.upgrades[upgrade.id] || 0;
+        // Show up to 2 helpers per upgrade type (keeps it from getting too crowded)
         for (let i = 0; i < Math.min(level, 2) && count < helperSystem.maxHelpers; i++) {
             const helperData = createInteractiveHelper(upgrade, count);
             if (helperData) {
@@ -720,7 +766,7 @@ function loadHelpers() {
         helperSystem.updateInterval = setInterval(updateHelpers, 100);
     }
 
-    // Add party elements
+    // Add party elements (visual effects for other upgrades)
     addPartyElements();
 }
 
@@ -733,7 +779,7 @@ function addPartyElements() {
     if (!scene) return;
 
     // Remove old party elements
-    scene.querySelectorAll('.party-element').forEach(el => el.remove());
+    scene.querySelectorAll('.party-element, .click-power-ring, .boost-orb, .streamer, .passive-indicator').forEach(el => el.remove());
 
     // Add floating balloons based on decorations
     const balloonLevel = gameState.upgrades['balloon1'] || 0;
@@ -745,6 +791,21 @@ function addPartyElements() {
         balloon.style.top = (5 + Math.random() * 20) + '%';
         balloon.style.animationDelay = (i * 0.5) + 's';
         scene.appendChild(balloon);
+    }
+
+    // Add streamers based on streamer upgrade
+    const streamerLevel = gameState.upgrades['streamer1'] || 0;
+    if (streamerLevel > 0) {
+        const colors = ['#e91e8c', '#9b59b6', '#3498db', '#2ecc71', '#f39c12'];
+        for (let i = 0; i < Math.min(streamerLevel, 6); i++) {
+            const streamer = document.createElement('div');
+            streamer.className = 'streamer';
+            streamer.style.left = (8 + i * 15) + '%';
+            streamer.style.top = '0';
+            streamer.style.background = `linear-gradient(180deg, ${colors[i % colors.length]}, transparent)`;
+            streamer.style.animationDelay = (i * 0.3) + 's';
+            scene.appendChild(streamer);
+        }
     }
 
     // Add disco lights if disco ball owned
@@ -760,14 +821,85 @@ function addPartyElements() {
         }
     }
 
-    // Add confetti if confetti cannon owned
+    // Add click power ring if click upgrades owned
+    const totalClickLevel = UPGRADES.clicking.reduce((sum, u) => sum + (gameState.upgrades[u.id] || 0), 0);
+    if (totalClickLevel >= 5) {
+        const ring = document.createElement('div');
+        ring.className = 'click-power-ring';
+        ring.classList.add(totalClickLevel >= 20 ? 'powered' : 'active');
+        const cakeContainer = document.querySelector('.main-cake-container');
+        if (cakeContainer) cakeContainer.appendChild(ring);
+    }
+
+    // Add boost orbs for active boosts
+    addBoostOrbs(scene);
+
+    // Add passive income indicator if helpers owned
+    const passiveIncome = calculatePassiveIncome();
+    if (passiveIncome > 0) {
+        const indicator = document.createElement('div');
+        indicator.className = 'passive-indicator';
+        indicator.innerHTML = `<span class="income-icon">⚡</span> +${formatNumber(passiveIncome)}/sec`;
+        scene.appendChild(indicator);
+    }
+
+    // Golden hour effect if very high click power
+    if (totalClickLevel >= 30) {
+        scene.classList.add('golden-hour');
+    } else {
+        scene.classList.remove('golden-hour');
+    }
+
+    // Add confetti if confetti cannon owned (only start once)
     const confettiLevel = gameState.upgrades['confetti1'] || 0;
-    if (confettiLevel > 0) {
+    if (confettiLevel > 0 && !scene.dataset.confettiStarted) {
+        scene.dataset.confettiStarted = 'true';
         setInterval(() => {
-            if (Math.random() < 0.3) {
+            if (Math.random() < 0.2) {
                 createSceneConfetti(scene);
             }
-        }, 500);
+        }, 600);
+    }
+}
+
+function addBoostOrbs(scene) {
+    const cakeContainer = document.querySelector('.main-cake-container');
+    if (!cakeContainer) return;
+
+    // Lucky charm orb
+    const luckyLevel = gameState.upgrades['lucky1'] || 0;
+    if (luckyLevel > 0) {
+        const orb = document.createElement('div');
+        orb.className = 'boost-orb luck';
+        orb.textContent = '🍀';
+        cakeContainer.appendChild(orb);
+    }
+
+    // Clock/speed orb
+    const clockLevel = gameState.upgrades['clock1'] || 0;
+    if (clockLevel > 0) {
+        const orb = document.createElement('div');
+        orb.className = 'boost-orb speed';
+        orb.textContent = '⏰';
+        cakeContainer.appendChild(orb);
+    }
+
+    // Star power orb
+    const starLevel = gameState.upgrades['star1'] || 0;
+    if (starLevel > 0 && gameState.partyStars > 0) {
+        const orb = document.createElement('div');
+        orb.className = 'boost-orb star';
+        orb.textContent = '⭐';
+        cakeContainer.appendChild(orb);
+    }
+
+    // Mega/power orb
+    const megaLevel = gameState.upgrades['mega1'] || 0;
+    if (megaLevel > 0) {
+        const orb = document.createElement('div');
+        orb.className = 'boost-orb power';
+        orb.textContent = '🔥';
+        cakeContainer.appendChild(orb);
     }
 }
 

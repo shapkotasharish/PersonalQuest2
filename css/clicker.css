@@ -205,26 +205,31 @@ body.theme-neon .dance-floor {
     pointer-events: none;
 }
 
-/* Helpers Area - Now full scene for roaming */
+/* Helpers Area - Full scene for roaming around cake */
 .helpers-area {
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     width: 100%;
-    height: 40%;
+    height: 100%;
     z-index: 5;
     pointer-events: none;
 }
 
-/* Individual Helper - Now absolutely positioned and moves! */
+/* Individual Helper - Roams the full scene around the cake */
 .helper {
     position: absolute;
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.3));
     cursor: pointer;
     pointer-events: auto;
     transition: transform 0.1s ease;
     z-index: 5;
+}
+
+/* Helpers avoid the center where cake is */
+.helper.near-cake {
+    filter: drop-shadow(2px 4px 12px rgba(255, 234, 167, 0.6));
 }
 
 .helper:hover {
@@ -437,6 +442,169 @@ body.theme-neon .dance-floor {
 @keyframes confetti-drift {
     0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
     100% { transform: translateY(100px) rotate(360deg); opacity: 0; }
+}
+
+/* Click Power Ring - shows when you have click upgrades */
+.click-power-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px;
+    height: 180px;
+    border: 3px solid transparent;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 8;
+}
+
+.click-power-ring.active {
+    border-color: rgba(255, 234, 167, 0.4);
+    animation: power-ring-pulse 2s ease-in-out infinite;
+}
+
+.click-power-ring.powered {
+    border-color: rgba(233, 30, 140, 0.6);
+    box-shadow: 0 0 20px rgba(233, 30, 140, 0.4), inset 0 0 20px rgba(233, 30, 140, 0.2);
+}
+
+@keyframes power-ring-pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+}
+
+/* Boost effect orbs that orbit the cake */
+.boost-orb {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 7;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 0 8px currentColor);
+}
+
+.boost-orb.luck {
+    color: #f1c40f;
+    animation: orbit-cake 8s linear infinite;
+}
+
+.boost-orb.speed {
+    color: #3498db;
+    animation: orbit-cake 6s linear infinite reverse;
+}
+
+.boost-orb.power {
+    color: #e74c3c;
+    animation: orbit-cake 10s linear infinite;
+    animation-delay: -3s;
+}
+
+.boost-orb.star {
+    color: #f39c12;
+    animation: orbit-cake 12s linear infinite;
+    animation-delay: -6s;
+}
+
+@keyframes orbit-cake {
+    0% { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+}
+
+/* Energy particles from clicking upgrades */
+.energy-particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--sparkle-yellow);
+    pointer-events: none;
+    animation: energy-float 3s ease-out infinite;
+}
+
+@keyframes energy-float {
+    0% { opacity: 0.8; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-60px) scale(0.3); }
+}
+
+/* Sparkle effect on cake */
+.sparkle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle, #fff 0%, transparent 70%);
+    border-radius: 50%;
+    animation: sparkle-pop 0.6s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes sparkle-pop {
+    0% { transform: scale(0); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.8; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+/* Passive income indicator */
+.passive-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    color: #81ecec;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(5px);
+}
+
+.passive-indicator .income-icon {
+    animation: coin-spin 2s linear infinite;
+}
+
+@keyframes coin-spin {
+    0%, 100% { transform: rotateY(0deg); }
+    50% { transform: rotateY(180deg); }
+}
+
+/* Golden hour effect when high click power */
+.party-scene.golden-hour {
+    background: linear-gradient(180deg,
+        rgba(241, 196, 15, 0.1) 0%,
+        rgba(243, 156, 18, 0.15) 50%,
+        rgba(0, 0, 0, 0.3) 100%
+    ) !important;
+}
+
+.party-scene.golden-hour .cake-glow {
+    background: radial-gradient(circle, rgba(241, 196, 15, 0.6) 0%, transparent 70%);
+}
+
+/* Streamer decorations */
+.streamer {
+    position: absolute;
+    width: 4px;
+    height: 60px;
+    background: linear-gradient(180deg, var(--pink), var(--purple));
+    border-radius: 2px;
+    transform-origin: top center;
+    animation: streamer-wave 2s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 2;
+}
+
+@keyframes streamer-wave {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
 }
 
 /* Upgrades Panel */
