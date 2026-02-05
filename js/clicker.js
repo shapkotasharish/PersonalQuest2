@@ -510,7 +510,7 @@ function purchaseUpgrade(upgrade, category) {
 
 const helperSystem = {
     helpers: [],
-    maxHelpers: 100, // Allow many more helpers
+    maxHelpers: 150, // No limit - show ALL helpers (max possible is ~123)
     updateInterval: null,
     helperScale: 1 // Will shrink as more helpers are added
 };
@@ -818,10 +818,14 @@ function tryHelperInteraction(helperData) {
 function addHelper(upgrade) {
     if (helperSystem.helpers.length >= helperSystem.maxHelpers) return;
 
-    // Recalculate scale with new helper
+    // Recalculate scale with new helper (same logic as loadHelpers)
     const totalHelpers = helperSystem.helpers.length + 1;
     let scale = 1.0;
-    if (totalHelpers > 50) {
+    if (totalHelpers > 100) {
+        scale = 0.22;
+    } else if (totalHelpers > 75) {
+        scale = 0.28;
+    } else if (totalHelpers > 50) {
         scale = 0.35;
     } else if (totalHelpers > 30) {
         scale = 0.45;
@@ -832,7 +836,7 @@ function addHelper(upgrade) {
     }
 
     // If scale changed significantly, reload all helpers to resize them
-    if (Math.abs(scale - helperSystem.helperScale) > 0.1) {
+    if (Math.abs(scale - helperSystem.helperScale) > 0.05) {
         loadHelpers();
         return;
     }
@@ -844,7 +848,7 @@ function addHelper(upgrade) {
 
     // Start update loop if not running
     if (!helperSystem.updateInterval) {
-        const updateSpeed = totalHelpers > 30 ? 200 : (totalHelpers > 15 ? 150 : 100);
+        const updateSpeed = totalHelpers > 50 ? 250 : (totalHelpers > 30 ? 200 : 100);
         helperSystem.updateInterval = setInterval(updateHelpers, updateSpeed);
     }
 }
@@ -870,13 +874,20 @@ function loadHelpers() {
     });
 
     // Calculate scale - shrink helpers as more are added
+    // This ensures ALL helpers fit on screen, even at max (123 helpers)
     // 1-5 helpers: full size (1.0)
-    // 6-15 helpers: medium (0.8)
-    // 16-30 helpers: small (0.6)
-    // 31-50 helpers: tiny (0.45)
-    // 50+ helpers: mini (0.35)
+    // 6-15 helpers: large (0.8)
+    // 16-30 helpers: medium (0.6)
+    // 31-50 helpers: small (0.45)
+    // 51-75 helpers: tiny (0.35)
+    // 76-100 helpers: mini (0.28)
+    // 100+ helpers: micro (0.22) - packed party!
     let scale = 1.0;
-    if (totalHelpers > 50) {
+    if (totalHelpers > 100) {
+        scale = 0.22;
+    } else if (totalHelpers > 75) {
+        scale = 0.28;
+    } else if (totalHelpers > 50) {
         scale = 0.35;
     } else if (totalHelpers > 30) {
         scale = 0.45;
@@ -903,8 +914,17 @@ function loadHelpers() {
 
     // Start update loop with slower interval for many helpers
     if (helperSystem.helpers.length > 0) {
-        // Slow down updates when there are many helpers
-        const updateSpeed = totalHelpers > 30 ? 200 : (totalHelpers > 15 ? 150 : 100);
+        // Slow down updates when there are many helpers for performance
+        let updateSpeed = 100;
+        if (totalHelpers > 100) {
+            updateSpeed = 300; // Very slow for 100+ helpers
+        } else if (totalHelpers > 50) {
+            updateSpeed = 250;
+        } else if (totalHelpers > 30) {
+            updateSpeed = 200;
+        } else if (totalHelpers > 15) {
+            updateSpeed = 150;
+        }
         helperSystem.updateInterval = setInterval(updateHelpers, updateSpeed);
     }
 
