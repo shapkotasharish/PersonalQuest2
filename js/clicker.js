@@ -508,11 +508,20 @@ const helperSystem = {
 };
 
 const HELPER_PHRASES = {
-    puppy: ['Woof!', 'Party time!', '*wags tail*', 'Yay!', '*happy dance*', 'Bork!'],
-    panda: ['Nom nom!', '*munch*', 'Bamboo!', 'So fluffy!', '*rolls around*', 'Yawn~'],
-    bunny: ['Hop hop!', '*wiggles nose*', 'Wheee!', 'Bouncy!', '*thump thump*'],
-    cat: ['Meow!', '*purrrr*', 'Party cat!', '*stretches*', 'Confetti!'],
-    special: ['Sparkle!', 'Magic!', '✨✨✨', 'Woooow!', '*glitters*', 'Amazing!']
+    puppy: ['Woof!', 'Party time!', '*wags tail*', 'Yay!', '*happy dance*', 'Bork!', 'Best day ever!', '*spins*'],
+    panda: ['Nom nom!', '*munch*', 'Bamboo!', 'So fluffy!', '*rolls around*', 'Yawn~', 'Snack time?', '*cuddles*'],
+    bunny: ['Hop hop!', '*wiggles nose*', 'Wheee!', 'Bouncy!', '*thump thump*', 'Carrots!', '*zoomies*'],
+    cat: ['Meow!', '*purrrr*', 'Party cat!', '*stretches*', 'Confetti!', '*naps*', 'Fancy!', '*pounces*'],
+    special: ['Sparkle!', 'Magic!', '✨✨✨', 'Woooow!', '*glitters*', 'Amazing!', 'Enchanted!', '*shimmers*']
+};
+
+// Helper action emojis that appear when doing special things
+const HELPER_ACTIONS = {
+    dance: ['💃', '🕺', '🎵', '🎶'],
+    sleep: ['💤', '😴', '💭'],
+    eat: ['🍰', '🧁', '🍪', '🍭'],
+    play: ['⚽', '🎾', '🎈', '🪀'],
+    celebrate: ['🎉', '🥳', '🎊', '✨']
 };
 
 // Get a random position that avoids the center (where cake is)
@@ -641,7 +650,7 @@ function updateHelpers() {
 function decideHelperAction(helperData) {
     const action = Math.random();
 
-    if (action < 0.5) {
+    if (action < 0.35) {
         // Walk to new position (avoiding center cake area)
         helperData.state = 'walking';
         const newPos = getRandomHelperPosition();
@@ -650,23 +659,98 @@ function decideHelperAction(helperData) {
         helperData.direction = helperData.targetX > helperData.x ? 1 : -1;
         helperData.element.style.setProperty('--dir', helperData.direction);
         helperData.element.classList.add('walking');
-    } else if (action < 0.65) {
+    } else if (action < 0.45) {
         // Random speech
         helperData.state = 'idle';
         helperData.element.classList.remove('walking');
-        if (Math.random() < 0.4) {
-            showHelperSpeech(helperData.element, helperData.type);
-        }
-    } else if (action < 0.85) {
+        showHelperSpeech(helperData.element, helperData.type);
+    } else if (action < 0.55) {
         // Try to interact with nearby helper
         helperData.state = 'idle';
         helperData.element.classList.remove('walking');
         tryHelperInteraction(helperData);
+    } else if (action < 0.65) {
+        // Do a special action (dance, sleep, eat, etc.)
+        helperData.state = 'idle';
+        helperData.element.classList.remove('walking');
+        doHelperSpecialAction(helperData);
+    } else if (action < 0.75) {
+        // Celebrate (jump and show emojis)
+        helperData.state = 'idle';
+        helperData.element.classList.remove('walking');
+        helperCelebrate(helperData);
+    } else if (action < 0.85) {
+        // Look at cake (turn towards center)
+        helperData.state = 'idle';
+        helperData.element.classList.remove('walking');
+        helperLookAtCake(helperData);
     } else {
         // Just idle
         helperData.state = 'idle';
         helperData.element.classList.remove('walking');
     }
+}
+
+// Helper does a special action with emoji
+function doHelperSpecialAction(helperData) {
+    const actions = ['dance', 'sleep', 'eat', 'play'];
+    const actionType = actions[Math.floor(Math.random() * actions.length)];
+    const emojis = HELPER_ACTIONS[actionType];
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+    // Add action class
+    helperData.element.classList.add('doing-action');
+
+    // Show action emoji above helper
+    showHelperActionEmoji(helperData.element, emoji);
+
+    // Remove after animation
+    setTimeout(() => {
+        helperData.element.classList.remove('doing-action');
+    }, 2000);
+}
+
+// Helper celebrates with jump and sparkles
+function helperCelebrate(helperData) {
+    const emojis = HELPER_ACTIONS.celebrate;
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+    helperData.element.classList.add('celebrating');
+    showHelperActionEmoji(helperData.element, emoji);
+
+    if (window.partyAudio && Math.random() < 0.3) {
+        window.partyAudio.playSparkle();
+    }
+
+    setTimeout(() => {
+        helperData.element.classList.remove('celebrating');
+    }, 1500);
+}
+
+// Helper turns to look at the cake
+function helperLookAtCake(helperData) {
+    // Face towards center (cake is at 50%)
+    const newDir = helperData.x < 50 ? 1 : -1;
+    helperData.direction = newDir;
+    helperData.element.style.setProperty('--dir', newDir);
+
+    // Show admiring expression
+    if (Math.random() < 0.5) {
+        showHelperSpeech(helperData.element, helperData.type);
+    }
+}
+
+// Show emoji above helper for actions
+function showHelperActionEmoji(helper, emoji) {
+    const existing = helper.querySelector('.helper-action');
+    if (existing) existing.remove();
+
+    const action = document.createElement('div');
+    action.className = 'helper-action';
+    action.textContent = emoji;
+    helper.appendChild(action);
+
+    setTimeout(() => action.remove(), 2000);
 }
 
 function moveHelper(helperData) {

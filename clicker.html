@@ -45,11 +45,17 @@
         <div class="game-area">
             <!-- Party Scene -->
             <div class="party-scene" id="partyScene">
-                <!-- Decorations Container -->
+                <!-- Base party lights -->
+                <div class="party-lights-top"></div>
+
+                <!-- Decorations Container (for unlockable decorations) -->
                 <div class="decorations-layer" id="decorationsLayer"></div>
 
-                <!-- Dance Floor -->
-                <div class="dance-floor" id="danceFloor"></div>
+                <!-- Corner decorations (always visible) -->
+                <div class="corner-deco top-left">🎀</div>
+                <div class="corner-deco top-right">🎁</div>
+                <div class="corner-deco bottom-left">🧁</div>
+                <div class="corner-deco bottom-right">🍭</div>
 
                 <!-- Main Clickable Cake -->
                 <div class="main-cake-container">
@@ -58,7 +64,7 @@
                     <div class="cake-sparkles" id="cakeSparkles"></div>
                 </div>
 
-                <!-- Helpers Area -->
+                <!-- Helpers Area (full scene) -->
                 <div class="helpers-area" id="helpersArea"></div>
             </div>
 
