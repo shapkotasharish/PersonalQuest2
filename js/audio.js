@@ -3,19 +3,19 @@
    With Real Music Player & Shuffle
    ============================================ */
 
-// Song library with metadata
+// Song library - using exact file names from Naavya's playlist
 const SONG_LIBRARY = [
-    { file: 'Firework.mp3', title: 'Firework', artist: 'Katy Perry', color: '#e74c3c' },
-    { file: 'Golden.mp3', title: 'Golden', artist: 'Harry Styles', color: '#f1c40f' },
-    { file: 'Mean Girls.mp3', title: 'Mean Girls', artist: 'Reneé Rapp', color: '#e91e8c' },
-    { file: 'NUNU NANA.mp3', title: 'NUNU NANA', artist: 'Jessi', color: '#9b59b6' },
-    { file: 'Newsflash.mp3', title: 'Newsflash', artist: 'NewJeans', color: '#3498db' },
-    { file: 'Numb Little Bug.mp3', title: 'Numb Little Bug', artist: 'Em Beihold', color: '#1abc9c' },
-    { file: 'On The Ground.mp3', title: 'On The Ground', artist: 'ROSÉ', color: '#e91e8c' },
-    { file: 'Rockstar.mp3', title: 'Rockstar', artist: 'LISA', color: '#2c3e50' },
-    { file: 'Strategy.mp3', title: 'Strategy', artist: 'TWICE', color: '#8e44ad' },
-    { file: 'ZOOM.mp3', title: 'ZOOM', artist: 'Jessi', color: '#e74c3c' },
-    { file: 'like JENNIE.mp3', title: 'like JENNIE', artist: 'Jennie', color: '#2c3e50' }
+    { file: 'Firework.mp3', title: 'Firework', color: '#e74c3c' },
+    { file: 'Golden.mp3', title: 'Golden', color: '#f1c40f' },
+    { file: 'Mean Girls.mp3', title: 'Mean Girls', color: '#e91e8c' },
+    { file: 'NUNU NANA.mp3', title: 'NUNU NANA', color: '#9b59b6' },
+    { file: 'Newsflash.mp3', title: 'Newsflash', color: '#3498db' },
+    { file: 'Numb Little Bug.mp3', title: 'Numb Little Bug', color: '#1abc9c' },
+    { file: 'On The Ground.mp3', title: 'On The Ground', color: '#f39c12' },
+    { file: 'Rockstar.mp3', title: 'Rockstar', color: '#2c3e50' },
+    { file: 'Strategy.mp3', title: 'Strategy', color: '#8e44ad' },
+    { file: 'ZOOM.mp3', title: 'ZOOM', color: '#e74c3c' },
+    { file: 'like JENNIE.mp3', title: 'like JENNIE', color: '#e91e8c' }
 ];
 
 class PartyAudio {
@@ -146,11 +146,9 @@ class PartyAudio {
         if (!container || !this.currentSong) return;
 
         const titleEl = container.querySelector('.np-title');
-        const artistEl = container.querySelector('.np-artist');
         const barsContainer = container.querySelector('.np-bars');
 
         if (titleEl) titleEl.textContent = this.currentSong.title;
-        if (artistEl) artistEl.textContent = this.currentSong.artist;
 
         // Update color theme
         container.style.setProperty('--song-color', this.currentSong.color);
@@ -437,10 +435,10 @@ function createNowPlayingUI() {
             <div class="np-bar"></div>
             <div class="np-bar"></div>
             <div class="np-bar"></div>
+            <div class="np-bar"></div>
         </div>
         <div class="np-info">
             <div class="np-title">Loading...</div>
-            <div class="np-artist"></div>
         </div>
         <button class="np-skip" title="Skip">⏭️</button>
     `;
@@ -477,20 +475,21 @@ function addNowPlayingStyles() {
             position: fixed;
             top: 70px;
             right: 16px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 8px 12px;
+            border-radius: 16px;
+            padding: 12px 18px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
             z-index: 1000;
             cursor: pointer;
             opacity: 0;
             transform: translateX(100px);
             transition: all 0.3s ease;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            max-width: 250px;
+            border: 3px solid rgba(255, 255, 255, 0.15);
+            max-width: 320px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .now-playing.visible {
@@ -499,24 +498,25 @@ function addNowPlayingStyles() {
         }
 
         .now-playing:hover {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             border-color: var(--song-color, #e91e8c);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4), 0 0 20px var(--song-color, #e91e8c);
         }
 
         /* Music bars animation */
         .np-bars {
             display: flex;
             align-items: flex-end;
-            gap: 2px;
-            height: 20px;
-            min-width: 20px;
+            gap: 3px;
+            height: 32px;
+            min-width: 28px;
         }
 
         .np-bar {
-            width: 3px;
+            width: 4px;
             background: var(--song-color, #e91e8c);
-            border-radius: 2px;
-            height: 4px;
+            border-radius: 3px;
+            height: 6px;
             transition: height 0.1s ease;
         }
 
@@ -526,12 +526,13 @@ function addNowPlayingStyles() {
 
         .np-bars.playing .np-bar:nth-child(1) { animation-delay: 0s; }
         .np-bars.playing .np-bar:nth-child(2) { animation-delay: 0.1s; }
-        .np-bars.playing .np-bar:nth-child(3) { animation-delay: 0.2s; }
-        .np-bars.playing .np-bar:nth-child(4) { animation-delay: 0.3s; }
+        .np-bars.playing .np-bar:nth-child(3) { animation-delay: 0.15s; }
+        .np-bars.playing .np-bar:nth-child(4) { animation-delay: 0.25s; }
+        .np-bars.playing .np-bar:nth-child(5) { animation-delay: 0.35s; }
 
         @keyframes musicBar {
-            0%, 100% { height: 4px; }
-            50% { height: 18px; }
+            0%, 100% { height: 6px; }
+            50% { height: 28px; }
         }
 
         /* Song info */
@@ -543,54 +544,64 @@ function addNowPlayingStyles() {
 
         .np-title {
             font-family: 'Fredoka', sans-serif;
-            font-size: 0.85rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: white;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        .np-artist {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.7);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         /* Skip button */
         .np-skip {
-            background: none;
+            background: rgba(255, 255, 255, 0.1);
             border: none;
-            font-size: 1rem;
+            font-size: 1.4rem;
             cursor: pointer;
-            opacity: 0.7;
+            opacity: 0.8;
             transition: all 0.2s ease;
-            padding: 4px;
+            padding: 8px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .np-skip:hover {
             opacity: 1;
-            transform: scale(1.2);
+            transform: scale(1.15);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         /* Responsive */
         @media (max-width: 600px) {
             .now-playing {
                 top: auto;
-                bottom: 70px;
+                bottom: 80px;
                 right: 10px;
-                max-width: 200px;
-                padding: 6px 10px;
+                max-width: 260px;
+                padding: 10px 14px;
             }
 
             .np-title {
-                font-size: 0.75rem;
+                font-size: 0.95rem;
             }
 
-            .np-artist {
-                font-size: 0.65rem;
+            .np-bars {
+                height: 26px;
+            }
+
+            .np-bar {
+                width: 3px;
+            }
+
+            .np-skip {
+                width: 36px;
+                height: 36px;
+                font-size: 1.2rem;
             }
         }
     `;
