@@ -54,18 +54,19 @@
     font-weight: 700;
 }
 
-/* Game Area */
+/* Game Area - Horizontal layout for laptops */
 .game-area {
     flex: 1;
     display: flex;
     gap: var(--spacing-md);
     padding: var(--spacing-md);
     overflow: hidden;
+    max-height: calc(100vh - 120px); /* Limit height for laptop screens */
 }
 
-/* Party Scene - Looks like an actual party! */
+/* Party Scene - Wide horizontal layout for better laptop viewing */
 .party-scene {
-    flex: 1;
+    flex: 2; /* Takes more horizontal space than upgrade panel */
     position: relative;
     background:
         /* Subtle confetti pattern overlay */
@@ -83,7 +84,8 @@
         );
     border-radius: var(--radius-xl);
     overflow: hidden;
-    min-height: 400px;
+    min-height: 300px;
+    max-height: 450px; /* Limit vertical height for horizontal feel */
     border: 3px solid rgba(255, 255, 255, 0.1);
     box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.2);
 }
@@ -786,15 +788,18 @@
     50% { transform: rotate(10deg); }
 }
 
-/* Upgrades Panel */
+/* Upgrades Panel - Compact width for more party scene space */
 .upgrades-panel {
-    width: 350px;
+    width: 300px;
+    min-width: 280px;
+    flex-shrink: 0;
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
     border-radius: var(--radius-xl);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    max-height: calc(100vh - 140px);
 }
 
 .panel-header {
