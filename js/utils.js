@@ -555,8 +555,8 @@ function initSecretEggs() {
     document.addEventListener('touchstart', startHold);
     document.addEventListener('touchend', cancelHold);
 
-    // SECRET-2: Pop 5 balloons in a row
-    initBalloonPops();
+    // SECRET-2: Tap the screen 5 times quickly
+    initQuickTaps();
 
     // SECRET-3: Reach 1000 Party Power (checked via polling)
     setInterval(() => {
@@ -574,71 +574,30 @@ function initSecretEggs() {
     }, 2000);
 }
 
-function initBalloonPops() {
+function initQuickTaps() {
     if (window.easterEggs && window.easterEggs.isFound('secret-2')) return;
 
-    let popsInARow = 0;
-    let lastPopTime = 0;
-    const balloonColors = ['🎈', '🩷', '🩵', '💜', '💛'];
+    let tapCount = 0;
+    let lastTapTime = 0;
 
-    function spawnBalloon() {
+    document.addEventListener('click', () => {
         if (window.easterEggs && window.easterEggs.isFound('secret-2')) return;
 
-        const balloon = document.createElement('div');
-        balloon.className = 'pop-balloon';
-        balloon.textContent = balloonColors[Math.floor(Math.random() * balloonColors.length)];
-        balloon.style.left = (10 + Math.random() * 80) + '%';
-        balloon.style.bottom = '-50px';
-        balloon.style.position = 'fixed';
-        balloon.style.fontSize = '2.5rem';
-        balloon.style.cursor = 'pointer';
-        balloon.style.zIndex = '999';
-        balloon.style.transition = 'transform 0.15s ease';
-        balloon.style.animation = 'balloon-rise ' + (4 + Math.random() * 3) + 's linear forwards';
-        balloon.style.pointerEvents = 'auto';
+        const now = Date.now();
+        if (now - lastTapTime < 1000) {
+            tapCount++;
+        } else {
+            tapCount = 1;
+        }
+        lastTapTime = now;
 
-        balloon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
+        if (tapCount >= 3) {
+            showToast(`⭐ Quick taps! (${tapCount}/5)`);
+        }
 
-            const now = Date.now();
-            if (now - lastPopTime < 5000) {
-                popsInARow++;
-            } else {
-                popsInARow = 1;
-            }
-            lastPopTime = now;
-
-            // Pop effect
-            balloon.style.transform = 'scale(1.5)';
-            balloon.style.opacity = '0';
-            if (window.partyAudio) window.partyAudio.playPop();
-
-            // Show pop count
-            showToast(`🎈 Pop! (${popsInARow}/5)`);
-
-            setTimeout(() => balloon.remove(), 200);
-
-            if (popsInARow >= 5 && window.easterEggs) {
-                window.easterEggs.findEgg('secret-2');
-                if (window.confetti) window.confetti.rain(2000);
-            }
-        });
-
-        document.body.appendChild(balloon);
-
-        // Remove after animation ends
-        setTimeout(() => {
-            if (balloon.parentElement) balloon.remove();
-        }, 8000);
-    }
-
-    // Spawn balloons periodically
-    setInterval(() => {
-        if (window.easterEggs && window.easterEggs.isFound('secret-2')) return;
-        if (Math.random() < 0.4) spawnBalloon();
-    }, 5000);
-
-    // Spawn first one after a short delay
-    setTimeout(spawnBalloon, 3000);
+        if (tapCount >= 5 && window.easterEggs) {
+            window.easterEggs.findEgg('secret-2');
+            if (window.confetti) window.confetti.rain(2000);
+        }
+    });
 }

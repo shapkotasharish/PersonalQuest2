@@ -32,97 +32,86 @@ function initLandingPage() {
 }
 
 // ==========================================
-// BALLOONS
+// FLOATING PARTY EMOJIS (replaces balloons)
 // ==========================================
 
 function initBalloons() {
     const container = document.getElementById('balloonsContainer');
     if (!container) return;
 
-    const balloonEmojis = ['🎈', '🎈', '🎈', '🎈', '🎈', '🎈'];
-    const balloonColors = ['#e91e8c', '#9b59b6', '#3498db', '#e74c3c', '#f39c12', '#2ecc71'];
+    const partyEmojis = ['🎁', '🎀', '⭐', '✨', '🌟', '🎉', '💫', '🧁'];
 
-    // Create initial balloons
+    // Create floating emojis
     for (let i = 0; i < 8; i++) {
-        createBalloon(container, balloonEmojis, balloonColors);
+        createFloatingEmoji(container, partyEmojis);
     }
 }
 
-function createBalloon(container, emojis, colors) {
-    const balloon = document.createElement('div');
-    balloon.className = 'balloon';
-    balloon.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+function createFloatingEmoji(container, emojis) {
+    const emoji = document.createElement('div');
+    emoji.className = 'floating-party-emoji';
+    emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+    emoji.style.fontSize = (1.5 + Math.random() * 1.5) + 'rem';
+    emoji.style.left = (5 + Math.random() * 90) + '%';
+    emoji.style.top = (10 + Math.random() * 80) + '%';
 
-    // Random position
-    balloon.style.left = (10 + Math.random() * 80) + '%';
-    balloon.style.top = (60 + Math.random() * 30) + '%';
-
-    // Random animation delay and duration
-    balloon.style.animationDelay = Math.random() * 2 + 's';
-    balloon.style.animationDuration = (3 + Math.random() * 3) + 's';
-
-    // Color filter
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    balloon.style.filter = `drop-shadow(2px 4px 6px rgba(0,0,0,0.2)) hue-rotate(${Math.random() * 360}deg)`;
-
-    // Click to pop
-    balloon.addEventListener('click', (e) => {
+    // Click to sparkle
+    emoji.addEventListener('click', (e) => {
         e.stopPropagation();
-        popBalloon(balloon, container, emojis, colors);
+        sparkleEmoji(emoji, emojis);
     });
 
-    // Hover sound
-    balloon.addEventListener('mouseenter', () => {
-        if (window.partyAudio) window.partyAudio.playHover();
-    });
-
-    container.appendChild(balloon);
-
-    // Float up animation
-    animateBalloonFloat(balloon);
+    container.appendChild(emoji);
+    animateEmojiFloat(emoji);
 }
 
-function animateBalloonFloat(balloon) {
-    const startY = parseFloat(balloon.style.top);
-    let y = startY;
-    const speed = 0.02 + Math.random() * 0.03;
+function animateEmojiFloat(emoji) {
+    const startX = parseFloat(emoji.style.left);
+    const startY = parseFloat(emoji.style.top);
+    let time = Math.random() * 100;
+    const speedX = 0.3 + Math.random() * 0.3;
+    const speedY = 0.2 + Math.random() * 0.3;
+    const rangeX = 3 + Math.random() * 4;
+    const rangeY = 3 + Math.random() * 4;
 
-    function float() {
-        if (!balloon.parentElement) return;
-
-        y -= speed;
-        if (y < -10) {
-            y = 110;
-            balloon.style.left = (10 + Math.random() * 80) + '%';
-        }
-        balloon.style.top = y + '%';
-        requestAnimationFrame(float);
+    function drift() {
+        if (!emoji.parentElement) return;
+        time += 0.01;
+        emoji.style.left = (startX + Math.sin(time * speedX) * rangeX) + '%';
+        emoji.style.top = (startY + Math.cos(time * speedY) * rangeY) + '%';
+        requestAnimationFrame(drift);
     }
-
-    requestAnimationFrame(float);
+    requestAnimationFrame(drift);
 }
 
-function popBalloon(balloon, container, emojis, colors) {
-    // Play pop sound
+function sparkleEmoji(emoji, emojis) {
     if (window.partyAudio) window.partyAudio.playPop();
 
-    // Add popping animation
-    balloon.classList.add('popping');
+    emoji.style.transform = 'scale(1.5) rotate(20deg)';
+    emoji.style.opacity = '1';
 
-    // Create confetti burst
-    const rect = balloon.getBoundingClientRect();
-    if (window.confetti) {
-        window.confetti.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 15);
+    // Sparkle burst
+    const rect = emoji.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    for (let i = 0; i < 6; i++) {
+        const spark = document.createElement('div');
+        spark.textContent = ['✨', '💫', '⭐'][Math.floor(Math.random() * 3)];
+        spark.style.cssText = `position:fixed;left:${cx}px;top:${cy}px;font-size:1.2rem;pointer-events:none;z-index:999;`;
+        document.body.appendChild(spark);
+        const angle = (i / 6) * Math.PI * 2;
+        const dist = 40 + Math.random() * 30;
+        spark.animate([
+            { transform: 'translate(0,0) scale(1)', opacity: 1 },
+            { transform: `translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist}px) scale(0)`, opacity: 0 }
+        ], { duration: 600, easing: 'ease-out' });
+        setTimeout(() => spark.remove(), 600);
     }
 
-    // Remove balloon and respawn
     setTimeout(() => {
-        balloon.remove();
-
-        // Respawn after delay
-        setTimeout(() => {
-            createBalloon(container, emojis, colors);
-        }, 2000 + Math.random() * 3000);
+        emoji.style.transform = 'scale(1) rotate(0deg)';
+        emoji.style.opacity = '0.7';
+        emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
     }, 300);
 }
 
@@ -250,7 +239,7 @@ function initPressAndHold() {
 
     function startHold(e) {
         // Don't trigger on interactive elements
-        if (e.target.closest('button, a, .balloon, .peek-character, .easter-egg')) return;
+        if (e.target.closest('button, a, .floating-party-emoji, .peek-character, .easter-egg')) return;
 
         holdStart = Date.now();
         progressIndicator.classList.add('active');

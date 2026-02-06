@@ -16,7 +16,7 @@ const EGG_DATA = [
     { id: 'eggs-2', hint: 'Check every corner carefully', page: 'Egg Hunt' },
     { id: 'eggs-3', hint: 'Sometimes eggs hide in plain sight', page: 'Egg Hunt' },
     { id: 'secret-1', hint: 'Hold down anywhere for magic', page: 'Secret' },
-    { id: 'secret-2', hint: 'Pop 5 balloons in a row!', page: 'Secret' },
+    { id: 'secret-2', hint: 'Tap the screen 5 times quickly!', page: 'Secret' },
     { id: 'secret-3', hint: 'Reach 1000 Party Power', page: 'Secret' }
 ];
 

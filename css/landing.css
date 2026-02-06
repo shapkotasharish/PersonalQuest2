@@ -194,7 +194,7 @@
     50% { transform: rotate(10deg); }
 }
 
-/* Balloons */
+/* Floating Party Emojis */
 .balloons-container {
     position: fixed;
     top: 0;
@@ -205,20 +205,19 @@
     z-index: 5;
 }
 
-.balloon {
+.floating-party-emoji {
     pointer-events: auto;
     position: absolute;
-    transition: transform 0.2s ease;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    user-select: none;
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
 }
 
-.balloon.popping {
-    animation: balloon-pop 0.3s ease-out forwards;
-}
-
-@keyframes balloon-pop {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.5); opacity: 0.5; }
-    100% { transform: scale(0); opacity: 0; }
+.floating-party-emoji:hover {
+    opacity: 1;
+    transform: scale(1.2);
 }
 
 /* Peek-a-boo Characters */
