@@ -497,6 +497,11 @@ function checkPerformance() {
 // ==========================================
 
 function formatNumber(num) {
+    if (num >= 1e36) return (num / 1e36).toFixed(2) + 'UDc'; // Undecillion
+    if (num >= 1e33) return (num / 1e33).toFixed(2) + 'Dc';  // Decillion
+    if (num >= 1e30) return (num / 1e30).toFixed(2) + 'No';  // Nonillion
+    if (num >= 1e27) return (num / 1e27).toFixed(2) + 'Oc';  // Octillion
+    if (num >= 1e24) return (num / 1e24).toFixed(2) + 'Sp';  // Septillion
     if (num >= 1e21) return (num / 1e21).toFixed(2) + 'Sx';  // Sextillion
     if (num >= 1e18) return (num / 1e18).toFixed(2) + 'Qi';  // Quintillion
     if (num >= 1e15) return (num / 1e15).toFixed(2) + 'Qa';  // Quadrillion
