@@ -78,7 +78,7 @@ const UPGRADES = {
         { id: 'lucky1', name: 'Lucky Charm', icon: '🍀', desc: '10% chance for 10x clicks', effect: 'Lucky clicks!', cost: 30000, luck: 0.10, luckMulti: 10, maxLevel: 10, costScale: 1.28 },
         { id: 'magnet1', name: 'Party Magnet', icon: '🧲', desc: 'Attract more party power!', effect: '+75% passive income', cost: 500000, passiveBoost: 0.75, maxLevel: 8, costScale: 1.32, requires: { party1: 1 } },
         { id: 'clock1', name: 'Party Time', icon: '⏰', desc: 'Time flies when having fun!', effect: '+100% helper speed', cost: 15000000, helperBoost: 1.0, maxLevel: 6, costScale: 1.35, requires: { magnet1: 3 } },
-        { id: 'star1', name: 'Star Power', icon: '⭐', desc: 'Starlight energy!', effect: '+10% per Party Star', cost: 1000000000, starBoost: 0.10, maxLevel: 10, costScale: 1.38, requires: { clock1: 2 } },
+        { id: 'star1', name: 'Star Power', icon: '⭐', desc: 'Boosts per star from Rebirth!', effect: '+10% per Party Star', cost: 1000000000, starBoost: 0.10, maxLevel: 10, costScale: 1.38, requires: { clock1: 2 } },
         { id: 'mega1', name: 'Mega Multiplier', icon: '🔥', desc: 'Everything is better!', effect: '+200% global', cost: 50e9, globalBoost: 2.0, maxLevel: 5, costScale: 1.45, requires: { star1: 3 } },
         { id: 'golden1', name: 'Golden Touch', icon: '👑', desc: 'Everything you touch turns to gold!', effect: '25x click power', cost: 5e12, clickMulti: 25, maxLevel: 3, costScale: 1.55, requires: { mega1: 2 } },
         { id: 'infinite1', name: 'Infinite Energy', icon: '♾️', desc: 'Unlimited power source!', effect: '+500% all income', cost: 200e12, globalBoost: 5.0, maxLevel: 3, costScale: 1.70, requires: { golden1: 2 } },
@@ -1254,7 +1254,7 @@ function initRebirth() {
     if (!rebirthBtn) return;
 
     rebirthBtn.addEventListener('click', () => {
-        if (gameState.partyPower >= 100000000000) { // 100 billion
+        if (gameState.totalEarned >= 100000000000) { // 100 billion total earned
             showRebirthConfirmation();
         }
     });
@@ -1278,8 +1278,8 @@ function showRebirthConfirmation() {
 }
 
 function calculateRebirthStars() {
-    // Rebirth at 100 billion, gain stars based on sqrt of power/100B
-    return Math.floor(Math.sqrt(gameState.partyPower / 100000000000));
+    // Rebirth at 100 billion total earned, gain stars based on sqrt of totalEarned/100B
+    return Math.max(1, Math.floor(Math.sqrt(gameState.totalEarned / 100000000000)));
 }
 
 function performRebirth() {
@@ -1375,14 +1375,15 @@ function updateDisplay() {
     const rebirthBtn = document.getElementById('rebirthBtn');
     const rebirthInfo = document.getElementById('rebirthInfo');
 
-    const REBIRTH_THRESHOLD = 100000000000; // 100 billion
-    if (gameState.partyPower >= REBIRTH_THRESHOLD) {
+    const REBIRTH_THRESHOLD = 100000000000; // 100 billion total earned
+    if (gameState.totalEarned >= REBIRTH_THRESHOLD) {
         rebirthBtn.disabled = false;
         const stars = calculateRebirthStars();
         rebirthInfo.textContent = `Gain ${stars} Party Star${stars !== 1 ? 's' : ''}!`;
     } else {
         rebirthBtn.disabled = true;
-        rebirthInfo.textContent = `Need ${formatNumber(REBIRTH_THRESHOLD - gameState.partyPower)} more`;
+        const remaining = REBIRTH_THRESHOLD - gameState.totalEarned;
+        rebirthInfo.textContent = `Earn ${formatNumber(remaining)} more total`;
     }
 
     // Update global multiplier based on stars
